@@ -107,12 +107,25 @@
   .ascii {
     font-family: var(--mono);
     font-weight: 700;
-    font-size: clamp(7px, 0.78vw, 11px);
+    font-size: 9px;
     line-height: 1.0;
     color: var(--fg);
     white-space: pre;
     margin: 0;
     overflow: hidden;
+    letter-spacing: 0;
+    user-select: none;
+  }
+  .hero-ascii {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+  .hero-ascii video,
+  .hero-ascii canvas { display: none; }
+  @media (max-width: 820px) {
+    .hero-ascii { aspect-ratio: 16 / 10; }
   }
 
   /* SECTIONS */
@@ -308,23 +321,10 @@
         <span class="sub">A graphic design studio that ships software. La Conner, Washington.</span>
       </h1>
     </div>
-    <figure aria-label="ASCII mountain range">
-<pre class="ascii">
-                                                      /\
-                                                     /  \
-                                                    /    \
-                                          /\       /      \
-                                         /  \    /          \
-                                /\      /    \  /            \             /\
-                               /  \    /      \/              \           /  \
-                       /\    /    \  /                         \         /    \
-                      /  \  /      \/                           \       /      \
-              /\     /    \/                                     \    /          \
-             /  \   /                                             \  /            \___
-        /\  /    \ /                                               \/                 \      /\
-   ___/  \/      v                                                                     \___/  \___
-__/                                                                                               \__
-</pre>
+    <figure class="hero-ascii" aria-label="Mountain range rendered as live ASCII art">
+      <video id="hero-vid" src="./mountain.mp4" autoplay loop muted playsinline preload="auto" aria-hidden="true"></video>
+      <pre id="hero-out" class="ascii"></pre>
+      <canvas id="hero-sample" aria-hidden="true"></canvas>
     </figure>
   </header>
 
@@ -418,6 +418,70 @@ __/                                                                             
   </footer>
 
 </div>
+
+<script>
+// Hero ASCII shader. Reads mountain.mp4 and renders luminance to a monospace
+// grid. Parameters were locked in via the tuning lab at /lab/ascii.
+(() => {
+  const vid    = document.getElementById('hero-vid');
+  const out    = document.getElementById('hero-out');
+  const sample = document.getElementById('hero-sample');
+  if (!vid || !out || !sample) return;
+  const fig = out.parentElement;
+  const ctx = sample.getContext('2d', { willReadFrequently: true });
+
+  const FONT_SIZE = 9;
+  const ASPECT    = 0.50;
+  const RAMP      = " .,'~+=|#";
+  const N         = RAMP.length - 1;
+  const CONTRAST  = 1.30;
+  const GAMMA     = 1.00;
+  const BRIGHT    = 0.00;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) { vid.removeAttribute('autoplay'); vid.pause(); }
+  else { vid.play?.().catch(() => {}); }
+
+  let lastW = 0, lastH = 0;
+  function tick() {
+    try {
+      const W = fig.clientWidth;
+      const H = fig.clientHeight;
+      const charW = Math.max(2, FONT_SIZE * ASPECT);
+      const cols = Math.max(20, Math.floor(W / charW));
+      const rows = Math.max(10, Math.floor(H / FONT_SIZE));
+      if (cols !== lastW || rows !== lastH) {
+        sample.width = cols; sample.height = rows;
+        lastW = cols; lastH = rows;
+      }
+      if (vid.readyState >= 2 && vid.videoWidth > 0) {
+        ctx.drawImage(vid, 0, 0, cols, rows);
+        const img = ctx.getImageData(0, 0, cols, rows).data;
+        const lines = new Array(rows);
+        for (let y = 0; y < rows; y++) {
+          let row = '';
+          const base = y * cols * 4;
+          for (let x = 0; x < cols; x++) {
+            const i = base + x * 4;
+            let lum = (0.299*img[i] + 0.587*img[i+1] + 0.114*img[i+2]) / 255;
+            lum = (lum - 0.5) * CONTRAST + 0.5 + BRIGHT;
+            if (lum < 0) lum = 0; else if (lum > 1) lum = 1;
+            lum = Math.pow(lum, GAMMA);
+            lum = 1 - lum;
+            let idx = (lum * N) | 0;
+            if (idx < 0) idx = 0; else if (idx > N) idx = N;
+            row += RAMP[idx];
+          }
+          lines[y] = row;
+        }
+        out.textContent = lines.join('\n');
+      }
+    } catch (_) { /* keep the loop alive */ }
+    if (!reduceMotion) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
 
 </body>
 </html>

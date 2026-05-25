@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMD Lab — ASCII Shader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#fafafa; --fg:#000; --rule:#e5e5e5; --mute:#888; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--fg); font-family:'Inter',-apple-system,sans-serif; font-size:14px; overflow:hidden; }
+  .app { display:grid; grid-template-columns: 300px 1fr; height:100vh; }
+  aside { padding:24px; border-right:1px solid var(--rule); height:100vh; overflow:auto; }
+  aside h1 { font-weight:700; font-size:16px; letter-spacing:-0.02em; }
+  aside .sub { color:var(--mute); margin: 4px 0 24px; font-size:12px; }
+  .group { border-top:1px solid var(--rule); padding:14px 0; }
+  .group label { display:block; font-size:11px; color:var(--mute); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em; }
+  .group input[type=range] { width:100%; accent-color:#000; }
+  .group input[type=text], .group select { width:100%; padding:8px 10px; border:1px solid var(--rule); background:#fff; font-family:'Inconsolata',monospace; font-size:13px; }
+  .row { display:flex; gap:10px; align-items:center; }
+  .val { font-family:'Inconsolata',monospace; font-size:11px; color:var(--mute); min-width:44px; text-align:right; }
+  .check { display:flex; align-items:center; gap:8px; font-size:13px; }
+  .preview { position:relative; overflow:hidden; }
+  .preview video { position:absolute; top:16px; right:16px; width:140px; border:1px solid var(--rule); z-index:5; opacity:0.85; background:#000; }
+  .ascii {
+    font-family: 'Inconsolata', ui-monospace, monospace;
+    font-weight: 700;
+    line-height: 1.0;
+    white-space: pre;
+    color: #000;
+    font-size: 9px;
+    letter-spacing: 0;
+    user-select: none;
+    padding: 16px;
+  }
+  .hint { color:var(--mute); font-size:11px; margin-top:20px; line-height:1.6; }
+  .hint code { background:#eee; padding:1px 5px; border-radius:2px; font-family:'Inconsolata',monospace; font-size:11px; }
+  .pill { display:inline-block; font-family:'Inconsolata',monospace; font-size:11px; padding:2px 7px; background:#000; color:#fff; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>ASCII Shader <span class="pill">v0.1</span></h1>
+    <div class="sub">MMD Lab // tuning the kevmo.me look</div>
+
+    <div class="group">
+      <label>Source</label>
+      <select id="source">
+        <option value="procedural" selected>Procedural mountains</option>
+        <option value="video">Video file (./mountain.mp4)</option>
+      </select>
+    </div>
+
+    <div class="group">
+      <label>Font size (px)</label>
+      <div class="row"><input type="range" id="font" min="5" max="20" step="1" value="9"><span class="val" id="fontv">9</span></div>
+    </div>
+
+    <div class="group">
+      <label>Cell aspect (w / h)</label>
+      <div class="row"><input type="range" id="aspect" min="0.40" max="0.70" step="0.01" value="0.50"><span class="val" id="aspectv">0.50</span></div>
+    </div>
+
+    <div class="group">
+      <label>Character ramp (light → dark)</label>
+      <input type="text" id="ramp" value=" .,'~+=|#">
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
+        <button class="preset" data-r=" .,'~+=|#">kevmo</button>
+        <button class="preset" data-r=" .:-=+*#%@">classic</button>
+        <button class="preset" data-r=" .,:;!|t#">thin</button>
+        <button class="preset" data-r=" ░▒▓█">blocks</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <label>Contrast</label>
+      <div class="row"><input type="range" id="contrast" min="0.5" max="3.0" step="0.05" value="1.30"><span class="val" id="contrastv">1.30</span></div>
+    </div>
+
+    <div class="group">
+      <label>Gamma</label>
+      <div class="row"><input type="range" id="gamma" min="0.3" max="3.0" step="0.05" value="1.00"><span class="val" id="gammav">1.00</span></div>
+    </div>
+
+    <div class="group">
+      <label>Brightness</label>
+      <div class="row"><input type="range" id="bright" min="-0.5" max="0.5" step="0.01" value="0.00"><span class="val" id="brightv">0.00</span></div>
+    </div>
+
+    <div class="group">
+      <label class="check"><input type="checkbox" id="invert"> Invert (light source = dense)</label>
+    </div>
+
+    <div class="group">
+      <button id="copy" style="width:100%;padding:10px;border:1px solid #000;background:#000;color:#fff;font-family:'Inconsolata',monospace;font-size:12px;cursor:pointer;">Copy current frame</button>
+    </div>
+
+    <div class="hint">
+      To tune against real footage: drop an mp4 at <code>./mountain.mp4</code> and switch source to Video. Pexels/Coverr have free CC clips.
+    </div>
+  </aside>
+
+  <main class="preview">
+    <video id="vid" loop muted playsinline></video>
+    <pre class="ascii" id="out"></pre>
+  </main>
+</div>
+
+<canvas id="sample" style="display:none;"></canvas>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const out = $('out'), vid = $('vid'), sample = $('sample');
+  const ctx = sample.getContext('2d', { willReadFrequently: true });
+
+  const state = {
+    source: 'procedural',
+    fontSize: 9,
+    aspect: 0.50,
+    ramp: " .,'~+=|#",
+    contrast: 1.30,
+    gamma: 1.00,
+    bright: 0.00,
+    invert: false,
+  };
+
+  const bind = (id, key, parse=parseFloat, fmt=v=>v.toFixed(2)) => {
+    const el = $(id), val = $(id+'v');
+    el.addEventListener('input', () => {
+      state[key] = parse(el.value);
+      if (val) val.textContent = fmt(state[key]);
+      if (key === 'fontSize') out.style.fontSize = state.fontSize + 'px';
+    });
+  };
+  bind('font', 'fontSize', v=>parseInt(v,10), v=>v.toString());
+  bind('aspect', 'aspect');
+  bind('contrast', 'contrast');
+  bind('gamma', 'gamma');
+  bind('bright', 'bright');
+
+  $('ramp').addEventListener('input', e => { state.ramp = e.target.value || ' .#'; });
+  $('invert').addEventListener('change', e => { state.invert = e.target.checked; });
+  function loadVideo() {
+    const url = new URL('mountain.mp4', document.baseURI).href;
+    console.log('[ascii-lab] loading video:', url);
+    vid.src = url;
+    vid.load();
+    vid.style.display = 'block';
+    vid.play().catch(err => console.log('[ascii-lab] play() rejected:', err));
+  }
+  $('source').addEventListener('change', e => {
+    state.source = e.target.value;
+    if (state.source === 'video') {
+      loadVideo();
+    } else {
+      vid.style.display = 'none';
+      vid.pause();
+    }
+  });
+  vid.addEventListener('loadeddata', () => console.log('[ascii-lab] video loaded:', vid.videoWidth, 'x', vid.videoHeight));
+  vid.addEventListener('error', () => {
+    const codes = {1:'ABORTED',2:'NETWORK',3:'DECODE',4:'SRC_NOT_SUPPORTED'};
+    const e = vid.error;
+    console.warn('[ascii-lab] video error', e && codes[e.code], e);
+  });
+  document.querySelectorAll('.preset').forEach(b => {
+    b.addEventListener('click', () => {
+      state.ramp = b.dataset.r;
+      $('ramp').value = b.dataset.r;
+    });
+  });
+  $('copy').addEventListener('click', () => {
+    navigator.clipboard.writeText(out.textContent).then(() => {
+      $('copy').textContent = 'Copied';
+      setTimeout(() => $('copy').textContent = 'Copy current frame', 1200);
+    });
+  });
+
+  out.style.fontSize = state.fontSize + 'px';
+
+  // ─── procedural source: layered ridges scrolling ───
+  const proc = document.createElement('canvas');
+  const pctx = proc.getContext('2d');
+  function drawProcedural(W, H, t) {
+    proc.width = W; proc.height = H;
+    const grad = pctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(1, '#cccccc');
+    pctx.fillStyle = grad;
+    pctx.fillRect(0, 0, W, H);
+
+    const layers = [
+      { amp: H*0.16, baseY: H*0.48, freq: 0.020, speed: 0.18, shade: '#b5b5b5' },
+      { amp: H*0.22, baseY: H*0.62, freq: 0.030, speed: 0.32, shade: '#7a7a7a' },
+      { amp: H*0.30, baseY: H*0.80, freq: 0.045, speed: 0.54, shade: '#1a1a1a' },
+    ];
+    for (const L of layers) {
+      pctx.fillStyle = L.shade;
+      pctx.beginPath();
+      pctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 1) {
+        const u = x * L.freq + t * L.speed;
+        const n = Math.sin(u) * 0.55
+                + Math.sin(u*2.3 + 1.1) * 0.30
+                + Math.sin(u*5.7 + 2.2) * 0.15;
+        const y = L.baseY - n * L.amp;
+        pctx.lineTo(x, y);
+      }
+      pctx.lineTo(W, H);
+      pctx.closePath();
+      pctx.fill();
+    }
+  }
+
+  // ─── ASCII render loop ─────────────────────────────
+  const start = performance.now();
+  let lastW = 0, lastH = 0;
+  let frameCount = 0;
+  let lastLogTime = performance.now();
+  let lastErrorAt = 0;
+  window.__asciiState = { frames: 0, lastErr: null, lastFrameUsed: 'none' };
+
+  function tick() {
+    try {
+      const fs = state.fontSize;
+      const charW = Math.max(2, fs * state.aspect);
+      const lineH = fs;
+      const previewEl = document.querySelector('.preview');
+      const W = previewEl.clientWidth - 32;
+      const H = previewEl.clientHeight - 32;
+      const cols = Math.max(20, Math.floor(W / charW));
+      const rows = Math.max(10, Math.floor(H / lineH));
+
+      if (cols !== lastW || rows !== lastH) {
+        sample.width = cols;
+        sample.height = rows;
+        lastW = cols; lastH = rows;
+      }
+
+      let usedSource = 'procedural';
+      if (state.source === 'video' && vid.readyState >= 2 && vid.videoWidth > 0) {
+        try {
+          ctx.drawImage(vid, 0, 0, cols, rows);
+          usedSource = 'video';
+        } catch (e) {
+          console.warn('[ascii-lab] drawImage(video) failed:', e.name, e.message);
+          window.__asciiState.lastErr = 'drawImage: ' + e.message;
+        }
+      }
+      if (usedSource === 'procedural') {
+        const t = (performance.now() - start) / 1000;
+        drawProcedural(cols, rows, t);
+        ctx.drawImage(proc, 0, 0, cols, rows);
+      }
+      window.__asciiState.lastFrameUsed = usedSource;
+
+      let img;
+      try {
+        img = ctx.getImageData(0, 0, cols, rows).data;
+      } catch (e) {
+        console.warn('[ascii-lab] getImageData failed (canvas tainted?):', e.name, e.message);
+        window.__asciiState.lastErr = 'getImageData: ' + e.message;
+        out.textContent = 'CANVAS TAINTED: ' + e.message + '\nVideo origin probably blocked. Check console.';
+        requestAnimationFrame(tick);
+        return;
+      }
+
+      const ramp = state.ramp;
+      const N = ramp.length - 1;
+      const { contrast, gamma, bright, invert } = state;
+
+      const lines = new Array(rows);
+      for (let y = 0; y < rows; y++) {
+        let row = '';
+        const base = y * cols * 4;
+        for (let x = 0; x < cols; x++) {
+          const i = base + x * 4;
+          let lum = (0.299*img[i] + 0.587*img[i+1] + 0.114*img[i+2]) / 255;
+          lum = (lum - 0.5) * contrast + 0.5 + bright;
+          if (lum < 0) lum = 0; else if (lum > 1) lum = 1;
+          lum = Math.pow(lum, gamma);
+          if (!invert) lum = 1 - lum;
+          let idx = (lum * N) | 0;
+          if (idx < 0) idx = 0; else if (idx > N) idx = N;
+          row += ramp[idx];
+        }
+        lines[y] = row;
+      }
+      out.textContent = lines.join('\n');
+
+      frameCount++;
+      window.__asciiState.frames = frameCount;
+      const now = performance.now();
+      if (now - lastLogTime > 2000) {
+        console.log(`[ascii-lab] ${frameCount} frames, src=${usedSource}, vid.currentTime=${vid.currentTime?.toFixed(2)}, vid.readyState=${vid.readyState}`);
+        lastLogTime = now;
+      }
+    } catch (e) {
+      const now = performance.now();
+      if (now - lastErrorAt > 1000) {
+        console.error('[ascii-lab] tick failed:', e);
+        window.__asciiState.lastErr = 'tick: ' + e.message;
+        lastErrorAt = now;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
