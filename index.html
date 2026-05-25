@@ -543,30 +543,46 @@ function setupBreathing(el) {
   const PERIOD = 7200 + Math.random() * 1600;        // ~7–9s per paragraph
   const phase  = Math.random() * Math.PI * 2;
   const start  = performance.now();
+  let loggedErr = false;
+  let alive = true;
 
   function render() {
-    const now = performance.now();
-    const t   = (now - start) / PERIOD * Math.PI * 2 + phase;
-    const w   = minWidth + (maxWidth - minWidth) * (0.5 + 0.5 * Math.sin(t));
+    if (!alive) return;
+    try {
+      const now = performance.now();
+      const t   = (now - start) / PERIOD * Math.PI * 2 + phase;
+      const w   = minWidth + (maxWidth - minWidth) * (0.5 + 0.5 * Math.sin(t));
 
-    const laid = layoutWithLines(prepared, w, lineHeight);
-    const dpr  = devicePixelRatio || 1;
-    const cw   = Math.ceil(maxWidth * dpr);
-    const ch   = Math.ceil(tall.height * dpr);
-    if (canvas.width !== cw || canvas.height !== ch) {
-      canvas.width  = cw;
-      canvas.height = ch;
-      canvas.style.width  = maxWidth + 'px';
-      canvas.style.height = tall.height + 'px';
-    }
+      const laid = layoutWithLines(prepared, w, lineHeight);
+      const dpr  = devicePixelRatio || 1;
+      const cw   = Math.ceil(maxWidth * dpr);
+      const ch   = Math.ceil(tall.height * dpr);
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width  = cw;
+        canvas.height = ch;
+        canvas.style.width  = maxWidth + 'px';
+        canvas.style.height = tall.height + 'px';
+      }
 
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, maxWidth, tall.height);
-    ctx.font = font;
-    ctx.fillStyle = color;
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i < laid.lines.length; i++) {
-      ctx.fillText(laid.lines[i].text, 0, (i + 0.5) * lineHeight);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, maxWidth, tall.height);
+      ctx.font = font;
+      ctx.fillStyle = color;
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i < laid.lines.length; i++) {
+        ctx.fillText(laid.lines[i].text, 0, (i + 0.5) * lineHeight);
+      }
+    } catch (e) {
+      if (!loggedErr) {
+        loggedErr = true;
+        console.warn('[breathe] render failed, falling back to DOM text:', e);
+      }
+      // Stop the loop and restore the DOM text
+      alive = false;
+      canvas.remove();
+      el.style.color = '';
+      el.style.minHeight = '';
+      return;
     }
     requestAnimationFrame(render);
   }
