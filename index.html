@@ -424,6 +424,7 @@
 <script>
 // Hero ASCII shader. Reads mountain.mp4 and renders luminance to a monospace
 // grid. Parameters were locked in via the tuning lab at /lab/ascii.
+// Exposes a tiny knock-out API on window.__hero for the gravity engine below.
 (() => {
   const vid    = document.getElementById('hero-vid');
   const out    = document.getElementById('hero-out');
@@ -444,14 +445,39 @@
   if (reduceMotion) { vid.removeAttribute('autoplay'); vid.pause(); }
   else { vid.play?.().catch(() => {}); }
 
+  const knocked = new Set();        // "r,c" cell keys currently knocked out
+  let lastLines = [];               // last rendered grid (for char lookup on knock)
+  let cols = 0, rows = 0;
+  let charW = FONT_SIZE * ASPECT;
+
+  window.__hero = {
+    get fontSize() { return FONT_SIZE; },
+    get charW() { return charW; },
+    get lineH() { return FONT_SIZE; },
+    get cols() { return cols; },
+    get rows() { return rows; },
+    figRect: () => fig.getBoundingClientRect(),
+    isKnocked: (r, c) => knocked.has(r + ',' + c),
+    knock: (r, c) => {
+      const k = r + ',' + c;
+      if (knocked.has(k)) return null;
+      const row = lastLines[r];
+      const ch = row ? row[c] : null;
+      if (!ch || ch === ' ') return null;
+      knocked.add(k);
+      return ch;
+    },
+    restore: (r, c) => knocked.delete(r + ',' + c),
+  };
+
   let lastW = 0, lastH = 0;
   function tick() {
     try {
       const W = fig.clientWidth;
       const H = fig.clientHeight;
-      const charW = Math.max(2, FONT_SIZE * ASPECT);
-      const cols = Math.max(20, Math.floor(W / charW));
-      const rows = Math.max(10, Math.floor(H / FONT_SIZE));
+      charW = Math.max(2, FONT_SIZE * ASPECT);
+      cols = Math.max(20, Math.floor(W / charW));
+      rows = Math.max(10, Math.floor(H / FONT_SIZE));
       if (cols !== lastW || rows !== lastH) {
         sample.width = cols; sample.height = rows;
         lastW = cols; lastH = rows;
@@ -464,6 +490,7 @@
           let row = '';
           const base = y * cols * 4;
           for (let x = 0; x < cols; x++) {
+            if (knocked.has(y + ',' + x)) { row += ' '; continue; }
             const i = base + x * 4;
             let lum = (0.299*img[i] + 0.587*img[i+1] + 0.114*img[i+2]) / 255;
             lum = (lum - 0.5) * CONTRAST + 0.5 + BRIGHT;
@@ -476,12 +503,303 @@
           }
           lines[y] = row;
         }
+        lastLines = lines;
         out.textContent = lines.join('\n');
       }
     } catch (_) { /* keep the loop alive */ }
     if (!reduceMotion) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+</script>
+
+<script>
+// Gravity engine. Mouse approaches a character within 80px and the character
+// detaches, falls under gravity, piles up at the bottom of the viewport, then
+// physically flies back to its origin 10 seconds later. Applies to all body
+// text and to the ASCII hero grid via the shader's knock-out API.
+(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if ('ontouchstart' in window && !window.matchMedia('(pointer: fine)').matches) return;
+
+  const REPEL_RADIUS  = 80;
+  const REBUILD_AFTER = 10000;
+  const FLY_BACK_MS   = 1300;
+  const GRAVITY       = 2200;
+  const KICK_BASE     = 240;
+  const KICK_JITTER   = 140;
+  const FLOOR_BUCKET  = 16;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'gravity-overlay';
+  Object.assign(overlay.style, {
+    position: 'fixed', left: '0', top: '0', width: '100%', height: '100%',
+    pointerEvents: 'none', zIndex: '50', overflow: 'hidden',
+  });
+  document.body.appendChild(overlay);
+
+  const pile = new Map();        // bucketKey -> stacked height in px
+  const active = [];             // particles
+  let mx = -9999, my = -9999;
+
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  // ─── Wrap all participating text characters in spans ─────────
+  // We do this once on load so layout is preserved and rect lookups are O(1).
+  // Hero ASCII is handled separately via the shader API.
+  const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'CANVAS', 'VIDEO', 'PRE']);
+  const charSpans = [];          // { span, char, parent, originRect }
+
+  function wrapTextNodes(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(n) {
+        if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        let p = n.parentNode;
+        while (p && p !== document.body) {
+          if (SKIP_TAGS.has(p.nodeName)) return NodeFilter.FILTER_REJECT;
+          if (p.id === 'hero-out' || p.id === 'gravity-overlay') return NodeFilter.FILTER_REJECT;
+          if (p.classList && p.classList.contains('grav-char')) return NodeFilter.FILTER_REJECT;
+          p = p.parentNode;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) nodes.push(n);
+
+    for (const node of nodes) {
+      const text = node.nodeValue;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === ' ' || ch === '\n' || ch === '\t') {
+          frag.appendChild(document.createTextNode(ch));
+          continue;
+        }
+        const span = document.createElement('span');
+        span.className = 'grav-char';
+        span.textContent = ch;
+        span.style.display = 'inline-block';
+        span.style.whiteSpace = 'pre';
+        frag.appendChild(span);
+        charSpans.push({ span, char: ch, knocked: false });
+      }
+      node.parentNode.replaceChild(frag, node);
+    }
+  }
+
+  // Cache rects after layout settles
+  function cacheRects() {
+    for (const c of charSpans) {
+      if (c.knocked) continue;
+      const r = c.span.getBoundingClientRect();
+      c.cx = r.left + r.width / 2;
+      c.cy = r.top + r.height / 2;
+      c.w = r.width;
+      c.h = r.height;
+    }
+  }
+
+  // ─── Particle spawning ───────────────────────────────────────
+  function spawnParticle({ char, originX, originY, w, h, cs, restore }) {
+    const span = document.createElement('span');
+    span.textContent = char;
+    span.style.position = 'absolute';
+    span.style.left = '0';
+    span.style.top = '0';
+    span.style.willChange = 'transform';
+    span.style.whiteSpace = 'pre';
+    if (cs) {
+      span.style.font = cs.font;
+      span.style.fontFamily = cs.fontFamily;
+      span.style.fontSize = cs.fontSize;
+      span.style.fontWeight = cs.fontWeight;
+      span.style.letterSpacing = cs.letterSpacing;
+      span.style.lineHeight = '1';
+      span.style.color = cs.color;
+    }
+    overlay.appendChild(span);
+
+    const dx = originX + w / 2 - mx;
+    const dy = originY + h / 2 - my;
+    const d = Math.max(1, Math.hypot(dx, dy));
+    const speed = KICK_BASE + Math.random() * KICK_JITTER;
+    const vx = (dx / d) * speed + (Math.random() - 0.5) * 80;
+    const vy = (dy / d) * speed - 120 - Math.random() * 100;
+
+    const p = {
+      span, char, originX, originY, x: originX, y: originY,
+      vx, vy, w, h,
+      knockedAt: performance.now(),
+      state: 'falling',
+      bucket: null,
+      flyStartAt: 0, flyFromX: 0, flyFromY: 0,
+      restore,
+    };
+    active.push(p);
+    paint(p);
+  }
+
+  function paint(p) {
+    p.span.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
+  }
+
+  // ─── Mouse proximity → knock ─────────────────────────────────
+  function knockNearMouse() {
+    // Body text chars
+    const R2 = REPEL_RADIUS * REPEL_RADIUS;
+    for (const c of charSpans) {
+      if (c.knocked || c.cx == null) continue;
+      const dx = c.cx - mx;
+      if (dx > REPEL_RADIUS || dx < -REPEL_RADIUS) continue;
+      const dy = c.cy - my;
+      if (dy > REPEL_RADIUS || dy < -REPEL_RADIUS) continue;
+      if (dx*dx + dy*dy < R2) {
+        c.knocked = true;
+        c.span.style.visibility = 'hidden';
+        const cs = getComputedStyle(c.span);
+        spawnParticle({
+          char: c.char,
+          originX: c.cx - c.w / 2,
+          originY: c.cy - c.h / 2,
+          w: c.w, h: c.h, cs,
+          restore: () => { c.span.style.visibility = 'visible'; c.knocked = false; },
+        });
+      }
+    }
+
+    // Hero ASCII cells
+    const hero = window.__hero;
+    if (hero) {
+      const rect = hero.figRect();
+      if (mx >= rect.left - REPEL_RADIUS && mx <= rect.right + REPEL_RADIUS &&
+          my >= rect.top  - REPEL_RADIUS && my <= rect.bottom + REPEL_RADIUS) {
+        const charW = hero.charW;
+        const lineH = hero.lineH;
+        const cols = hero.cols;
+        const rows = hero.rows;
+        const cMin = Math.max(0, Math.floor((mx - rect.left - REPEL_RADIUS) / charW));
+        const cMax = Math.min(cols - 1, Math.ceil((mx - rect.left + REPEL_RADIUS) / charW));
+        const rMin = Math.max(0, Math.floor((my - rect.top  - REPEL_RADIUS) / lineH));
+        const rMax = Math.min(rows - 1, Math.ceil((my - rect.top  + REPEL_RADIUS) / lineH));
+        for (let r = rMin; r <= rMax; r++) {
+          const cy = rect.top + (r + 0.5) * lineH;
+          for (let c = cMin; c <= cMax; c++) {
+            if (hero.isKnocked(r, c)) continue;
+            const cx = rect.left + (c + 0.5) * charW;
+            const dx = cx - mx;
+            const dy = cy - my;
+            if (dx*dx + dy*dy >= R2) continue;
+            const ch = hero.knock(r, c);
+            if (!ch) continue;
+            const heroPre = document.getElementById('hero-out');
+            const cs = getComputedStyle(heroPre);
+            spawnParticle({
+              char: ch,
+              originX: cx - charW / 2,
+              originY: cy - lineH / 2,
+              w: charW, h: lineH, cs,
+              restore: () => hero.restore(r, c),
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // ─── Physics loop ────────────────────────────────────────────
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+
+    knockNearMouse();
+
+    const fy = window.innerHeight;
+    for (let i = active.length - 1; i >= 0; i--) {
+      const p = active[i];
+      const age = now - p.knockedAt;
+
+      if (p.state === 'falling') {
+        p.vy += GRAVITY * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        // wall bounce
+        if (p.x < 0) { p.x = 0; p.vx = -p.vx * 0.4; }
+        else if (p.x + p.w > window.innerWidth) { p.x = window.innerWidth - p.w; p.vx = -p.vx * 0.4; }
+        // floor pile collision
+        const bucketKey = Math.floor((p.x + p.w / 2) / FLOOR_BUCKET);
+        const stack = pile.get(bucketKey) || 0;
+        const restY = fy - stack - p.h;
+        if (p.y >= restY) {
+          p.y = restY;
+          p.vx = 0; p.vy = 0;
+          p.state = 'resting';
+          p.bucket = bucketKey;
+          pile.set(bucketKey, stack + p.h);
+        }
+      }
+      else if (p.state === 'resting') {
+        if (age >= REBUILD_AFTER) {
+          if (p.bucket != null) {
+            pile.set(p.bucket, Math.max(0, (pile.get(p.bucket) || 0) - p.h));
+          }
+          p.state = 'flying';
+          p.flyStartAt = now;
+          p.flyFromX = p.x;
+          p.flyFromY = p.y;
+        }
+      }
+      else if (p.state === 'flying') {
+        const t = Math.min(1, (now - p.flyStartAt) / FLY_BACK_MS);
+        const e = 1 - Math.pow(1 - t, 3);
+        p.x = p.flyFromX + (p.originX - p.flyFromX) * e;
+        p.y = p.flyFromY + (p.originY - p.flyFromY) * e;
+        if (t >= 1) {
+          p.restore?.();
+          p.span.remove();
+          active.splice(i, 1);
+          continue;
+        }
+      }
+
+      paint(p);
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  // ─── Boot ───────────────────────────────────────────────────
+  function boot() {
+    wrapTextNodes(document.body);
+    requestAnimationFrame(() => {
+      cacheRects();
+      requestAnimationFrame(loop);
+    });
+  }
+
+  // Wait for fonts so rect math is stable
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(boot);
+  } else {
+    window.addEventListener('load', boot);
+  }
+
+  // Recompute rects on resize (and reset piles to avoid stale state)
+  let resizeT;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => {
+      for (let i = active.length - 1; i >= 0; i--) {
+        active[i].restore?.();
+        active[i].span.remove();
+      }
+      active.length = 0;
+      pile.clear();
+      cacheRects();
+    }, 150);
+  });
 })();
 </script>
 
