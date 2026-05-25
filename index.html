@@ -296,9 +296,30 @@
   footer a:hover { color: var(--fg); }
   .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
 
+  /* ─── HAIRLINE DRAW-IN ──────────────────────────────────── */
+  .top, .hero, section { position: relative; border-bottom-color: transparent; }
+  .top::after, .hero::after, section::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 1px; background: var(--rule);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .in-view::after { transform: scaleX(1); }
+
+  /* ─── DIRECTION-AWARE MICRO SHADOW ─────────────────────── */
+  :root { --ms-x: 0px; --ms-y: 0px; }
+  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.18); }
+  /* Canvas-rendered paragraphs have transparent DOM text; suppress shadow
+     so the invisible glyphs don't leak as shadows. */
+  .lede, .services .d, .project-desc, .ascii { text-shadow: none; }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { transition: none !important; animation: none !important; }
+    .top::after, .hero::after, section::after { transform: scaleX(1); }
+    body { text-shadow: none; }
   }
 </style>
 </head>
@@ -422,6 +443,66 @@
 </div>
 
 <script>
+// Subtle ambient effects: hairline draw-in on scroll-into-view, direction-aware
+// micro shadow on display type, and scroll-driven wordmark tracking. All three
+// are individually quiet; the page just feels a touch more alive in aggregate.
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── 1. Hairline draw-in ─────────────────────────────────
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.top, .hero, section').forEach(el => io.observe(el));
+
+  if (reduce) return;
+
+  // ─── 2. Direction-aware micro shadow ─────────────────────
+  let pmx = 0, pmy = 0, vmx = 0, vmy = 0;
+  let lastT = performance.now();
+  window.addEventListener('mousemove', (e) => {
+    const now = performance.now();
+    const dt = Math.max(1, now - lastT);
+    vmx = (e.clientX - pmx) * 16 / dt;
+    vmy = (e.clientY - pmy) * 16 / dt;
+    pmx = e.clientX; pmy = e.clientY;
+    lastT = now;
+  }, { passive: true });
+
+  // ─── 3. Wordmark scroll tracking ─────────────────────────
+  const wm = document.querySelector('.wordmark');
+  const LS_NEAR = -0.045;
+  const LS_FAR  = -0.058;
+
+  function paint() {
+    // Shadow: decay velocity, write CSS vars (opposite of motion)
+    vmx *= 0.88;
+    vmy *= 0.88;
+    const sx = Math.max(-2.5, Math.min(2.5, -vmx * 0.18));
+    const sy = Math.max(-2.5, Math.min(2.5, -vmy * 0.18));
+    document.documentElement.style.setProperty('--ms-x', sx.toFixed(2) + 'px');
+    document.documentElement.style.setProperty('--ms-y', sy.toFixed(2) + 'px');
+
+    // Wordmark tracking
+    if (wm) {
+      const sy2 = window.scrollY;
+      const docH = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const p = Math.min(1, Math.max(0, sy2 / docH));
+      wm.style.letterSpacing = (LS_NEAR + (LS_FAR - LS_NEAR) * p).toFixed(4) + 'em';
+    }
+
+    requestAnimationFrame(paint);
+  }
+  requestAnimationFrame(paint);
+})();
+</script>
+
+<script>
 // Hero ASCII shader. Reads mountain.mp4 and renders luminance to a monospace
 // grid. Parameters were locked in via the tuning lab at /lab/ascii.
 (() => {
@@ -444,6 +525,15 @@
   if (reduceMotion) { vid.removeAttribute('autoplay'); vid.pause(); }
   else { vid.play?.().catch(() => {}); }
 
+  // Track mouse for cursor bloom on the hero
+  let mxPage = -9999, myPage = -9999;
+  window.addEventListener('mousemove', e => {
+    mxPage = e.clientX; myPage = e.clientY;
+  }, { passive: true });
+  const BLOOM_R  = 75;
+  const BLOOM_R2 = BLOOM_R * BLOOM_R;
+  const BLOOM_K  = 0.40;   // peak darkening at cursor center
+
   let lastW = 0, lastH = 0;
   function tick() {
     try {
@@ -456,6 +546,14 @@
         sample.width = cols; sample.height = rows;
         lastW = cols; lastH = rows;
       }
+      // Mouse position relative to the figure (for bloom)
+      const figRect = fig.getBoundingClientRect();
+      const mInside =
+        mxPage >= figRect.left - BLOOM_R && mxPage <= figRect.right + BLOOM_R &&
+        myPage >= figRect.top  - BLOOM_R && myPage <= figRect.bottom + BLOOM_R;
+      const figMx = mxPage - figRect.left;
+      const figMy = myPage - figRect.top;
+
       if (vid.readyState >= 2 && vid.videoWidth > 0) {
         ctx.drawImage(vid, 0, 0, cols, rows);
         const img = ctx.getImageData(0, 0, cols, rows).data;
@@ -463,12 +561,24 @@
         for (let y = 0; y < rows; y++) {
           let row = '';
           const base = y * cols * 4;
+          const cellY = (y + 0.5) * FONT_SIZE;
+          const dy = mInside ? cellY - figMy : 9999;
           for (let x = 0; x < cols; x++) {
             const i = base + x * 4;
             let lum = (0.299*img[i] + 0.587*img[i+1] + 0.114*img[i+2]) / 255;
             lum = (lum - 0.5) * CONTRAST + 0.5 + BRIGHT;
             if (lum < 0) lum = 0; else if (lum > 1) lum = 1;
             lum = Math.pow(lum, GAMMA);
+            if (mInside) {
+              const cellX = (x + 0.5) * charW;
+              const dx = cellX - figMx;
+              const d2 = dx*dx + dy*dy;
+              if (d2 < BLOOM_R2) {
+                const k = 1 - Math.sqrt(d2) / BLOOM_R;
+                lum -= k * BLOOM_K;
+                if (lum < 0) lum = 0;
+              }
+            }
             lum = 1 - lum;
             let idx = (lum * N) | 0;
             if (idx < 0) idx = 0; else if (idx > N) idx = N;
@@ -518,10 +628,25 @@ function setupBreathing(el) {
   const baseWidth = el.clientWidth;
   if (baseWidth < 100) return;                       // too narrow to play with
   const AMP    = 18;                                 // ±18px swing
-  const minWidth = Math.max(80, baseWidth - AMP);
-  const maxWidth = baseWidth;
+  let minWidth = Math.max(80, baseWidth - AMP);
+  let maxWidth = baseWidth;
 
   const prepared = prepareWithSegments(text, font);
+
+  // Widow control: iteratively shrink the oscillation range so neither
+  // extreme produces a last line shorter than ~18% of its container.
+  const hasWidow = (laid, w) => {
+    if (laid.lines.length < 2) return false;
+    return laid.lines[laid.lines.length - 1].width < w * 0.18;
+  };
+  for (let i = 0; i < 5 && maxWidth - minWidth >= 12; i++) {
+    const hi = layoutWithLines(prepared, maxWidth, lineHeight);
+    if (hasWidow(hi, maxWidth)) { maxWidth -= 8; continue; }
+    const lo = layoutWithLines(prepared, minWidth, lineHeight);
+    if (hasWidow(lo, minWidth)) { minWidth += 8; continue; }
+    break;
+  }
+
   // Tallest possible layout (at minWidth) reserves the box height
   const tall = layoutWithLines(prepared, minWidth, lineHeight);
   el.style.minHeight = tall.height + 'px';
