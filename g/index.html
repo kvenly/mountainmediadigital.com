@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G — Golf duels in iMessage</title>
+<meta name="description" content="G is asynchronous golf for iMessage. Play your hole, send it, and your friend plays the same one. Nine courses, three formats, no schedules.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="G — Golf duels in iMessage">
+<meta property="og:description" content="Play your hole, send it, and it rides along in the bubble. Nine courses, three formats, endless needle.">
+<meta property="og:url" content="https://mountainmediadigital.com/g/">
+<meta property="og:site_name" content="Mountain Media Digital">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Inconsolata:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:      #fafafa;
+    --fg:      #000000;
+    --fg-dim:  #6a6a6a;
+    --fg-mute: #a8a8a8;
+    --rule:    #e5e5e5;
+
+    /* G's own colors — cream, clubhouse green, pennant pink. */
+    --cream:   #f6efd8;
+    --green:   #0f6b4f;
+    --green-d: #0b4f3b;
+    --pink:    #f2a9c4;
+
+    --sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --serif:   'Playfair Display', Georgia, 'Times New Roman', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--fg); text-decoration: none; }
+  a:hover { color: var(--fg-dim); }
+  ::selection { background: var(--green); color: var(--cream); }
+  img, video { max-width: 100%; display: block; }
+
+  .page { padding: 32px 40px; }
+  @media (max-width: 600px) { .page { padding: 20px; } }
+
+  /* TOP STRIP — matches the studio site */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+    color: var(--fg-dim);
+  }
+  .top .meta span { color: var(--fg-mute); padding: 0 4px; }
+  .top nav { display: flex; gap: 28px; }
+  .top nav a { color: var(--fg); }
+  @media (max-width: 600px) {
+    .top { flex-direction: column; gap: 12px; align-items: flex-start; font-size: 13px; }
+    .top nav { gap: 18px; }
+  }
+
+  /* HERO */
+  .hero { padding: 64px 0 72px; border-bottom: 1px solid var(--rule); }
+  .mark { width: 92px; margin-bottom: 28px; }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(44px, 8vw, 92px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    max-width: 14ch;
+  }
+  .hero .sub {
+    margin-top: 22px;
+    font-size: clamp(17px, 2.1vw, 21px);
+    line-height: 1.5;
+    color: var(--fg-dim);
+    max-width: 54ch;
+    font-weight: 300;
+  }
+  .badges { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--green); color: var(--cream);
+    padding: 14px 26px; border-radius: 999px;
+    font-size: 15px; font-weight: 600;
+  }
+  .cta:hover { background: var(--green-d); color: var(--cream); }
+  .cta-note { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); }
+
+  /* FILM STRIP — phone-shaped media, shown at phone scale */
+  .film { padding: 64px 0; border-bottom: 1px solid var(--rule); }
+  .film-grid {
+    display: flex; flex-wrap: wrap; gap: 40px 56px;
+    justify-content: center; align-items: flex-start;
+  }
+  .plate { width: 274px; max-width: 78vw; }
+  .screen {
+    background: var(--cream);
+    border-radius: 30px;
+    padding: 8px;
+    box-shadow: 0 1px 0 var(--rule), 0 26px 60px -28px rgba(0,0,0,.42);
+  }
+  .screen video, .screen img { border-radius: 23px; width: 100%; }
+  .cap {
+    font-family: var(--mono); font-size: 12.5px; color: var(--fg-mute);
+    margin-top: 14px; letter-spacing: 0.01em; line-height: 1.45;
+  }
+
+  /* SECTIONS */
+  .sec { padding: 72px 0; border-bottom: 1px solid var(--rule); }
+  .sec h2 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  .sec .lede {
+    font-size: 17px; color: var(--fg-dim); max-width: 62ch;
+    font-weight: 300; line-height: 1.55; margin-bottom: 44px;
+  }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--fg-mute); margin-bottom: 16px;
+  }
+
+  /* THREE STEPS */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  @media (max-width: 820px) { .steps { grid-template-columns: 1fr; gap: 28px; } }
+  .step .n {
+    font-family: var(--serif); font-size: 40px; color: var(--pink);
+    line-height: 1; margin-bottom: 12px;
+  }
+  .step h3 { font-size: 17px; font-weight: 600; margin-bottom: 7px; }
+  .step p { font-size: 15px; color: var(--fg-dim); font-weight: 300; line-height: 1.55; }
+
+  /* COURSES */
+  .courses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  @media (max-width: 900px) { .courses { grid-template-columns: repeat(2, 1fr); } }
+  .course img { border-radius: 14px; background: var(--cream); }
+  .course .name { font-size: 15px; font-weight: 600; margin-top: 12px; }
+  .course .where { font-family: var(--mono); font-size: 12.5px; color: var(--fg-mute); margin-top: 2px; }
+  .roster {
+    margin-top: 40px; display: flex; flex-wrap: wrap; gap: 8px 10px;
+    font-family: var(--mono); font-size: 13.5px; color: var(--fg-dim);
+  }
+  .roster span { background: var(--cream); padding: 6px 13px; border-radius: 999px; }
+
+  /* FORMATS */
+  .formats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 820px) { .formats { grid-template-columns: 1fr; } }
+  .fmt { background: var(--cream); border-radius: 18px; padding: 28px 26px; }
+  .fmt h3 { font-family: var(--serif); font-size: 25px; color: var(--green); margin-bottom: 8px; }
+  .fmt p { font-size: 15px; color: #4c5b53; font-weight: 300; line-height: 1.55; }
+
+  /* PULLQUOTE */
+  .pull { padding: 76px 0; border-bottom: 1px solid var(--rule); }
+  .pull p {
+    font-family: var(--serif); font-size: clamp(24px, 3.6vw, 40px);
+    line-height: 1.25; max-width: 20ch; letter-spacing: -0.01em;
+  }
+  .pull .who { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); margin-top: 22px; }
+
+  /* FOOT */
+  .foot {
+    padding: 48px 0 8px; display: flex; justify-content: space-between;
+    flex-wrap: wrap; gap: 18px; font-size: 14px; color: var(--fg-dim);
+  }
+  .foot nav { display: flex; gap: 24px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <div class="meta">Mountain Media Digital LLC <span>·</span> La Conner, WA</div>
+    <nav>
+      <a href="/">Studio</a>
+      <a href="#how">How it works</a>
+      <a href="#courses">Courses</a>
+      <a href="/g-support.html">Support</a>
+    </nav>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <img class="mark" src="g-mark.svg" alt="G">
+    <h1>Golf that lives in your iMessages.</h1>
+    <p class="sub">
+      Play your hole, send it, and it rides along in the bubble. Your friend opens it,
+      watches your shots replay as a ghost show — same wind, same ground, same
+      everything — then plays the hole their way and sends it back.
+      No schedules. No lobbies. Just the thread.
+    </p>
+    <div class="badges">
+      <a class="cta" href="#how">See how it plays</a>
+      <span class="cta-note">iPhone · coming to the App Store</span>
+    </div>
+  </section>
+
+  <!-- FILM -->
+  <section class="film" id="film">
+    <div class="film-grid">
+      <div class="plate">
+        <div class="screen">
+          <video src="flyover.mp4" autoplay muted loop playsinline preload="auto"></video>
+        </div>
+        <p class="cap">No. 1 at Coral Cay — every hole opens with a flyover.</p>
+      </div>
+      <div class="plate">
+        <div class="screen">
+          <video src="drive.mp4" autoplay muted loop playsinline preload="auto"></video>
+        </div>
+        <p class="cap">One flick up the screen. Pure it and the camera rides with the ball.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="sec" id="how">
+    <div class="eyebrow">The loop</div>
+    <h2>One hole. Back and forth.</h2>
+    <p class="lede">
+      G is an iMessage app, so a round is just a conversation you're already having.
+      Nothing to schedule, nothing to install for the person you're playing.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <h3>Open an iMessage thread</h3>
+        <p>Tap the apps button beside the text field and pick the G. Choose three random holes, the front nine, or the back nine.</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h3>Play your hole and send it</h3>
+        <p>A light, fast flick is the whole swing. When you finish the hole, the match travels inside the message bubble.</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h3>They play the same hole</h3>
+        <p>Same wind, same ground, same everything — then it comes back to you with their shots drawn over yours.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSES -->
+  <section class="sec" id="courses">
+    <div class="eyebrow">Nine courses</div>
+    <h2>Nine worlds, not nine reskins.</h2>
+    <p class="lede">
+      Every course has its own horizon, its own light, and its own sound — songbirds,
+      rain in the pines, gulls over the wash, a city humming in the distance.
+    </p>
+    <div class="courses">
+      <div class="course">
+        <img src="02-lakepines-plan.jpg" alt="Lake Pines">
+        <div class="name">Lake Pines</div>
+        <div class="where">steep peaks, still water</div>
+      </div>
+      <div class="course">
+        <img src="04-coralcay-plan.jpg" alt="Coral Cay">
+        <div class="name">Coral Cay</div>
+        <div class="where">island hopping</div>
+      </div>
+      <div class="course">
+        <img src="05-concretejungle-plan.jpg" alt="Concrete Jungle">
+        <div class="name">Concrete Jungle</div>
+        <div class="where">down the avenues</div>
+      </div>
+      <div class="course">
+        <img src="06-sheepranch-plan.jpg" alt="Sheep Ranch">
+        <div class="name">Sheep Ranch</div>
+        <div class="where">sea-stack links</div>
+      </div>
+    </div>
+    <div class="roster">
+      <span>The Gyre</span><span>Lake Pines</span><span>Canyon Run</span>
+      <span>Coral Cay</span><span>Grassroots</span><span>Gnome Hollow</span>
+      <span>Concrete Jungle</span><span>Sheep Ranch</span><span>Proving Ground</span>
+    </div>
+  </section>
+
+  <!-- FORMATS -->
+  <section class="sec">
+    <div class="eyebrow">Three games</div>
+    <h2>Pick your needle.</h2>
+    <p class="lede">
+      Each format speaks its own language on the card, and the bubble always says it in
+      names — because both of you are reading the same message.
+    </p>
+    <div class="formats">
+      <div class="fmt">
+        <h3>Stroke</h3>
+        <p>Lowest total wins the round. The honest one.</p>
+      </div>
+      <div class="fmt">
+        <h3>Match</h3>
+        <p>Hole by hole. Go three up with two to play and it's over early — dormie and all.</p>
+      </div>
+      <div class="fmt">
+        <h3>Skins</h3>
+        <p>Every hole is its own pot. Tie it and the pot carries. The pressure stacks up fast.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PULL -->
+  <section class="pull">
+    <p>“Being able to pop in and out without switching apps is super clutch.”</p>
+    <div class="who">— a tester, on why his friend downloaded it</div>
+  </section>
+
+  <!-- IN THE THREAD -->
+  <section class="sec">
+    <div class="eyebrow">In the thread</div>
+    <h2>It looks like a message, because it is one.</h2>
+    <p class="lede">
+      The match lives in the bubble. Tap it to play your hole; send it back when you're done.
+      Every course is free when a friend invites you.
+    </p>
+    <div class="film-grid">
+      <div class="plate">
+        <div class="screen"><img src="imsg-04-bubble.jpg" alt="A G match inside an iMessage thread"></div>
+        <p class="cap">The final card, sent to the thread.</p>
+      </div>
+      <div class="plate">
+        <div class="screen"><img src="imsg-01-compact.jpg" alt="G in the iMessage app drawer"></div>
+        <p class="cap">Opened from the app drawer, beside the text field.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div>© 2026 Mountain Media Digital LLC</div>
+    <nav>
+      <a href="/">Studio</a>
+      <a href="/g-privacy.html">Privacy</a>
+      <a href="/g-support.html">Support</a>
+      <a href="mailto:hello@mountainmediadigital.com">Contact</a>
+    </nav>
+  </div>
+
+</div>
+</body>
+</html>
