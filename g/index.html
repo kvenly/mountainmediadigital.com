@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>G — Golf duels in iMessage</title>
+<title>G · Golf duels in iMessage</title>
 <meta name="description" content="G is asynchronous golf for iMessage. Play your hole, send it, and your friend plays the same one. Nine courses, three formats, no schedules.">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="G — Golf duels in iMessage">
+<meta property="og:title" content="G · Golf duels in iMessage">
 <meta property="og:description" content="Play your hole, send it, and it rides along in the bubble. Nine courses, three formats, endless needle.">
 <meta property="og:url" content="https://mountainmediadigital.com/g/">
 <meta property="og:site_name" content="Mountain Media Digital">
@@ -24,7 +24,7 @@
     --fg-mute: #a8a8a8;
     --rule:    #e5e5e5;
 
-    /* G's own colors — cream, clubhouse green, pennant pink. */
+    /* G's own colors: cream, clubhouse green, pennant pink. */
     --cream:   #f6efd8;
     --green:   #0f6b4f;
     --green-d: #0b4f3b;
@@ -53,7 +53,7 @@
   .page { padding: 32px 40px; }
   @media (max-width: 600px) { .page { padding: 20px; } }
 
-  /* TOP STRIP — matches the studio site */
+  /* TOP STRIP: matches the studio site */
   .top {
     display: flex;
     justify-content: space-between;
@@ -71,7 +71,7 @@
     .top nav { gap: 18px; }
   }
 
-  /* HERO — the course itself, with the type standing in its sky. */
+  /* HERO: the course itself, with the type standing in its sky. */
   .hero {
     position: relative; isolation: isolate;
     margin: 0 -40px; padding: 96px 40px 104px;
@@ -120,7 +120,7 @@
   .cta:hover { background: var(--green-d); color: var(--cream); }
   .cta-note { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); }
 
-  /* FILM STRIP — phone-shaped media, shown at phone scale */
+  /* FILM STRIP: phone-shaped media, shown at phone scale */
   .film { padding: 64px 0; border-bottom: 1px solid var(--rule); }
   .film-grid {
     display: flex; flex-wrap: wrap; gap: 40px 56px;
@@ -191,7 +191,11 @@
     font-family: var(--serif); font-size: clamp(24px, 3.6vw, 40px);
     line-height: 1.25; max-width: 20ch; letter-spacing: -0.01em;
   }
-  .pull .who { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); margin-top: 22px; }
+  .pull .who { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); margin-top: 22px;
+    display: flex; align-items: center; justify-content: center; gap: 10px; }
+  /* A drawn rule instead of a dash character, so the attribution still
+     reads as an attribution. */
+  .pull .who::before { content: ''; width: 26px; height: 1px; background: currentColor; opacity: 0.55; }
 
   /* FOOT */
   .foot {
@@ -220,7 +224,7 @@
     <h1>Golf that lives in your iMessages.</h1>
     <p class="sub">
       Play your hole and send it. Your friend plays the same one and sends it
-      back — inside the conversation you're already having.
+      back, inside the conversation you're already having.
     </p>
     <div class="badges">
       <a class="cta" href="#how">See how it plays</a>
@@ -235,7 +239,7 @@
         <div class="screen">
           <video src="flyover.mp4" autoplay muted loop playsinline preload="auto"></video>
         </div>
-        <p class="cap">No. 1 at Coral Cay — every hole opens with a flyover.</p>
+        <p class="cap">No. 1 at Coral Cay. Every hole opens with a flyover.</p>
       </div>
       <div class="plate">
         <div class="screen">
@@ -268,7 +272,7 @@
       <div class="step">
         <div class="n">3</div>
         <h3>They play the same hole</h3>
-        <p>Same wind, same ground, same everything — then it comes back to you with their shots drawn over yours.</p>
+        <p>Same wind, same ground, same everything. Then it comes back to you with their shots drawn over yours.</p>
       </div>
     </div>
   </section>
@@ -278,7 +282,7 @@
     <div class="eyebrow">Nine courses</div>
     <h2>Nine worlds, not nine reskins.</h2>
     <p class="lede">
-      Every course has its own horizon, its own light, and its own sound — songbirds,
+      Every course has its own horizon, its own light, and its own sound: songbirds,
       rain in the pines, gulls over the wash, a city humming in the distance.
     </p>
     <div class="courses">
@@ -326,7 +330,7 @@
     <h2>Pick your needle.</h2>
     <p class="lede">
       Each format speaks its own language on the card, and the bubble always says it in
-      names — because both of you are reading the same message.
+      names, because both of you are reading the same message.
     </p>
     <div class="formats">
       <div class="fmt">
@@ -335,7 +339,7 @@
       </div>
       <div class="fmt">
         <h3>Match</h3>
-        <p>Hole by hole. Go three up with two to play and it's over early — dormie and all.</p>
+        <p>Hole by hole. Go three up with two to play and it's over early, dormie and all.</p>
       </div>
       <div class="fmt">
         <h3>Skins</h3>
@@ -347,7 +351,7 @@
   <!-- PULL -->
   <section class="pull">
     <p>“Being able to pop in and out without switching apps is super clutch.”</p>
-    <div class="who">— a tester, on why his friend downloaded it</div>
+    <div class="who">a tester, on why his friend downloaded it</div>
   </section>
 
   <!-- IN THE THREAD -->
