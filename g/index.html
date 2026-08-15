@@ -89,19 +89,22 @@
   .hero h1 {
     font-family: var(--serif);
     font-weight: 700;
-    font-size: clamp(42px, 7.4vw, 86px);
-    line-height: 0.99;
+    font-size: clamp(40px, 6.6vw, 80px);
+    line-height: 1.0;
     letter-spacing: -0.02em;
-    max-width: 15ch;
+    max-width: 16ch;
+    /* Let the browser even out the lines instead of stranding a word. */
+    text-wrap: balance;
     text-shadow: 0 2px 30px rgba(0,0,0,.42);
   }
   .hero .sub {
     margin-top: 22px;
-    font-size: clamp(16px, 2.1vw, 20px);
-    line-height: 1.55;
-    color: rgba(255,255,255,.88);
-    max-width: 52ch;
+    font-size: clamp(17px, 2.1vw, 21px);
+    line-height: 1.5;
+    color: rgba(255,255,255,.9);
+    max-width: 40ch;
     font-weight: 300;
+    text-wrap: pretty;
     text-shadow: 0 1px 20px rgba(0,0,0,.45);
   }
   .hero .cta { background: var(--cream); color: var(--green); }
@@ -216,10 +219,8 @@
     <img class="mark" src="g-mark.svg" alt="G">
     <h1>Golf that lives in your iMessages.</h1>
     <p class="sub">
-      Play your hole, send it, and it rides along in the bubble. Your friend opens it,
-      watches your shots replay as a ghost show — same wind, same ground, same
-      everything — then plays the hole their way and sends it back.
-      No schedules. No lobbies. Just the thread.
+      Play your hole and send it. Your friend plays the same one and sends it
+      back — inside the conversation you're already having.
     </p>
     <div class="badges">
       <a class="cta" href="#how">See how it plays</a>
