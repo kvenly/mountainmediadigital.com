@@ -185,6 +185,45 @@
   .fmt h3 { font-family: var(--serif); font-size: 25px; color: var(--green); margin-bottom: 8px; }
   .fmt p { font-size: 15px; color: #4c5b53; font-weight: 300; line-height: 1.55; }
 
+  /* ── Extruded glyphs ──────────────────────────────────────────────
+     The app spins these in SceneKit: one bezier extruded along Z,
+     pennant-pink faces, deeper walls, a slow turn about Y. The browser
+     has no extrude, so each is a stack of copies stepped along Z inside
+     a preserve-3d parent. Same silhouette, same colors, same period. */
+  .gl-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .gl {
+    width: 96px; height: 96px; margin: 0 auto;
+    display: grid; place-items: center;
+    perspective: 620px;
+    /* The app stands these on the clubhouse green, which is what makes
+       the pink carry. Same plinth here. */
+    background: var(--green); border-radius: 22px;
+  }
+  .gl-spin {
+    position: relative; width: 96px; height: 96px;
+    transform-style: preserve-3d;
+    animation: gl-turn var(--turn, 9s) linear infinite;
+  }
+  .gl-spin > svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    transform: translateZ(var(--z));
+    fill: #e08aab;                 /* BrandCoin.pennantDeep, the walls */
+  }
+  .gl-spin > svg.f { fill: var(--pink); }   /* pennant, the two faces */
+  @keyframes gl-turn { to { transform: rotateY(360deg); } }
+
+  /* A object spinning forever is a nuisance if motion is a problem.
+     Hold it at a three-quarter angle, where the extrusion still reads. */
+  @media (prefers-reduced-motion: reduce) {
+    .gl-spin { animation: none; transform: rotateY(-24deg); }
+  }
+  .fmt { text-align: center; }
+  .fmt .gl { margin-bottom: 18px; }
+  /* The section's own mark. It leads the eyebrow, so it lines up with
+     the text column rather than floating centered over left-set type. */
+  .sec > .gl { margin: 0 0 22px; }
+
+
   /* PULLQUOTE */
   .pull { padding: 76px 0; border-bottom: 1px solid var(--rule); }
   .pull p {
@@ -206,6 +245,19 @@
 </style>
 </head>
 <body>
+<svg class="gl-defs" aria-hidden="true" focusable="false"><defs>
+    <path id="gl-bubble" fill-rule="evenodd" d="M-0.62 -1.1 H0.62 A0.48 0.48 0 0 1 1.1 -0.62 V0.62 A0.48 0.48 0 0 1 0.62 1.1 H-0.62 A0.48 0.48 0 0 1 -1.1 0.62 V-0.62 A0.48 0.48 0 0 1 -0.62 -1.1 Z M0.66 -0.10 C0.66 -0.40 0.36 -0.65 0 -0.65 C-0.36 -0.65 -0.66 -0.40 -0.66 -0.10 C-0.66 0.15 -0.60 0.22 -0.50 0.30 C-0.52 0.42 -0.54 0.55 -0.62 0.66 C-0.40 0.60 -0.28 0.45 0 0.45 C0.36 0.45 0.66 0.20 0.66 -0.10 Z"/>
+    <mask id="gl-coin-mask" maskUnits="userSpaceOnUse"
+          x="-1.3" y="-1.3" width="2.6" height="2.6">
+      <circle cx="0" cy="0" r="1.15" fill="#fff"/>
+      <text x="0" y="0" fill="#000" font-family="'Playfair Display',Georgia,serif"
+            font-weight="600" font-size="1.72" text-anchor="middle"
+            dominant-baseline="central">G</text>
+    </mask>
+    <g id="gl-coin"><circle cx="0" cy="0" r="1.15" mask="url(#gl-coin-mask)"/></g>
+    <path id="gl-match" fill-rule="evenodd" d="M-0.685 -0.935 V0.935 A0.085 0.085 0 0 1 -0.515 0.935 V-0.935 A0.085 0.085 0 0 1 -0.685 -0.935 Z M-0.52 -0.95 C0.02 -0.88 0.54 -0.75 0.92 -0.52 C0.54 -0.28 0.02 -0.16 -0.52 -0.12 Z"/>
+    <path id="gl-stroke" fill-rule="evenodd" d="M-0.74 -1.04 H0.74 A0.21 0.21 0 0 1 0.95 -0.83 V0.83 A0.21 0.21 0 0 1 0.74 1.04 H-0.74 A0.21 0.21 0 0 1 -0.95 0.83 V-0.83 A0.21 0.21 0 0 1 -0.74 -1.04 Z M-0.515 -0.705 H0.515 A0.085 0.085 0 0 1 0.515 -0.535 H-0.515 A0.085 0.085 0 0 1 -0.515 -0.705 Z M0.160 -0.200 V0.680 A0.060 0.060 0 0 1 0.280 0.680 V-0.200 A0.060 0.060 0 0 1 0.160 -0.200 Z M-0.505 -0.315 H-0.035 A0.075 0.075 0 0 1 -0.035 -0.165 H-0.505 A0.075 0.075 0 0 1 -0.505 -0.315 Z M-0.505 0.165 H-0.035 A0.075 0.075 0 0 1 -0.035 0.315 H-0.505 A0.075 0.075 0 0 1 -0.505 0.165 Z M-0.505 0.645 H-0.035 A0.075 0.075 0 0 1 -0.035 0.795 H-0.505 A0.075 0.075 0 0 1 -0.505 0.645 Z M0.495 -0.315 H0.545 A0.075 0.075 0 0 1 0.545 -0.165 H0.495 A0.075 0.075 0 0 1 0.495 -0.315 Z M0.495 0.165 H0.545 A0.075 0.075 0 0 1 0.545 0.315 H0.495 A0.075 0.075 0 0 1 0.495 0.165 Z M0.495 0.645 H0.545 A0.075 0.075 0 0 1 0.545 0.795 H0.495 A0.075 0.075 0 0 1 0.495 0.645 Z"/>
+</defs></svg>
 <div class="page">
 
   <div class="top">
@@ -334,14 +386,55 @@
     </p>
     <div class="formats">
       <div class="fmt">
+        <div class="gl gl-stroke" style="--turn:9s" aria-hidden="true">
+          <div class="gl-spin">
+          <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:-5.16px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-4.13px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-3.10px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-2.07px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-1.03px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:0.00px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:1.03px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:2.07px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:3.10px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:4.13px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:5.16px" aria-hidden="true"><use href="#gl-stroke"/></svg>
+          </div>
+        </div>
         <h3>Stroke</h3>
         <p>Lowest total wins the round. The honest one.</p>
       </div>
       <div class="fmt">
+        <div class="gl gl-match" style="--turn:9s" aria-hidden="true">
+          <div class="gl-spin">
+          <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:-5.16px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-4.13px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-3.10px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-2.07px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-1.03px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:0.00px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:1.03px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:2.07px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:3.10px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:4.13px" aria-hidden="true"><use href="#gl-match"/></svg>
+          <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:5.16px" aria-hidden="true"><use href="#gl-match"/></svg>
+          </div>
+        </div>
         <h3>Match</h3>
         <p>Hole by hole. Go three up with two to play and it's over early, dormie and all.</p>
       </div>
       <div class="fmt">
+        <div class="gl gl-coin" style="--turn:8.4s" aria-hidden="true">
+          <div class="gl-spin">
+          <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:-3.34px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-2.23px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-1.11px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:0.00px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:1.11px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:2.23px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:3.34px" aria-hidden="true"><use href="#gl-coin"/></svg>
+          </div>
+        </div>
         <h3>Skins</h3>
         <p>Every hole is its own pot. Tie it and the pot carries. The pressure stacks up fast.</p>
       </div>
@@ -356,6 +449,24 @@
 
   <!-- IN THE THREAD -->
   <section class="sec">
+    <div class="gl gl-bubble" style="--turn:9s" aria-hidden="true">
+      <div class="gl-spin">
+      <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:-6.84px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-5.78px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-4.73px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-3.68px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-2.63px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-1.58px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:-0.53px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:0.53px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:1.58px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:2.63px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:3.68px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:4.73px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg viewBox="-1.58 -1.58 3.16 3.16" style="--z:5.78px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      <svg class="f" viewBox="-1.58 -1.58 3.16 3.16" style="--z:6.84px" aria-hidden="true"><use href="#gl-bubble"/></svg>
+      </div>
+    </div>
     <div class="eyebrow">In the thread</div>
     <h2>It looks like a message, because it is one.</h2>
     <p class="lede">
