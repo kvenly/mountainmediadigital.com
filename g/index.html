@@ -71,25 +71,42 @@
     .top nav { gap: 18px; }
   }
 
-  /* HERO */
-  .hero { padding: 64px 0 72px; border-bottom: 1px solid var(--rule); }
-  .mark { width: 92px; margin-bottom: 28px; }
+  /* HERO — the course itself, with the type standing in its sky. */
+  .hero {
+    position: relative; isolation: isolate;
+    margin: 0 -40px; padding: 96px 40px 104px;
+    border-bottom: 1px solid var(--rule);
+    background: #123a6b url('hero-lakepines.jpg') center 45% / cover no-repeat;
+    color: #fff;
+  }
+  @media (max-width: 600px) { .hero { margin: 0 -20px; padding: 64px 20px 76px; } }
+  .hero::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(180deg,
+      rgba(8,26,52,.70) 0%, rgba(8,26,52,.40) 48%, rgba(8,26,52,.28) 100%);
+  }
+  .mark { width: 84px; margin-bottom: 26px; filter: brightness(0) invert(1); }
   .hero h1 {
     font-family: var(--serif);
     font-weight: 700;
-    font-size: clamp(44px, 8vw, 92px);
-    line-height: 0.98;
+    font-size: clamp(42px, 7.4vw, 86px);
+    line-height: 0.99;
     letter-spacing: -0.02em;
-    max-width: 14ch;
+    max-width: 15ch;
+    text-shadow: 0 2px 30px rgba(0,0,0,.42);
   }
   .hero .sub {
     margin-top: 22px;
-    font-size: clamp(17px, 2.1vw, 21px);
-    line-height: 1.5;
-    color: var(--fg-dim);
-    max-width: 54ch;
+    font-size: clamp(16px, 2.1vw, 20px);
+    line-height: 1.55;
+    color: rgba(255,255,255,.88);
+    max-width: 52ch;
     font-weight: 300;
+    text-shadow: 0 1px 20px rgba(0,0,0,.45);
   }
+  .hero .cta { background: var(--cream); color: var(--green); }
+  .hero .cta:hover { background: #fff; color: var(--green-d); }
+  .hero .cta-note { color: rgba(255,255,255,.74); }
   .badges { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
   .cta {
     display: inline-flex; align-items: center; gap: 9px;
@@ -146,9 +163,10 @@
   .step p { font-size: 15px; color: var(--fg-dim); font-weight: 300; line-height: 1.55; }
 
   /* COURSES */
-  .courses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .courses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   @media (max-width: 900px) { .courses { grid-template-columns: repeat(2, 1fr); } }
-  .course img { border-radius: 14px; background: var(--cream); }
+  @media (max-width: 560px) { .courses { grid-template-columns: 1fr; } }
+  .course img { border-radius: 14px; background: var(--cream); aspect-ratio: 3/2; object-fit: cover; }
   .course .name { font-size: 15px; font-weight: 600; margin-top: 12px; }
   .course .where { font-family: var(--mono); font-size: 12.5px; color: var(--fg-mute); margin-top: 2px; }
   .roster {
@@ -264,24 +282,34 @@
     </p>
     <div class="courses">
       <div class="course">
-        <img src="02-lakepines-plan.jpg" alt="Lake Pines">
-        <div class="name">Lake Pines</div>
-        <div class="where">steep peaks, still water</div>
-      </div>
-      <div class="course">
-        <img src="04-coralcay-plan.jpg" alt="Coral Cay">
+        <img src="w-coralcay.jpg" alt="Coral Cay" loading="lazy">
         <div class="name">Coral Cay</div>
-        <div class="where">island hopping</div>
+        <div class="where">island target golf, open sea</div>
       </div>
       <div class="course">
-        <img src="05-concretejungle-plan.jpg" alt="Concrete Jungle">
-        <div class="name">Concrete Jungle</div>
-        <div class="where">down the avenues</div>
+        <img src="w-canyonrun.jpg" alt="Canyon Run" loading="lazy">
+        <div class="name">Canyon Run</div>
+        <div class="where">red rock and cactus</div>
       </div>
       <div class="course">
-        <img src="06-sheepranch-plan.jpg" alt="Sheep Ranch">
+        <img src="w-sheepranch.jpg" alt="Sheep Ranch" loading="lazy">
         <div class="name">Sheep Ranch</div>
-        <div class="where">sea-stack links</div>
+        <div class="where">dunes at golden hour</div>
+      </div>
+      <div class="course">
+        <img src="w-grassroots.jpg" alt="Grassroots" loading="lazy">
+        <div class="name">Grassroots</div>
+        <div class="where">ant height in the backyard</div>
+      </div>
+      <div class="course">
+        <img src="w-gnomehollow.jpg" alt="Gnome Hollow" loading="lazy">
+        <div class="name">Gnome Hollow</div>
+        <div class="where">cottages, and steady rain</div>
+      </div>
+      <div class="course">
+        <img src="w-concretejungle.jpg" alt="Concrete Jungle" loading="lazy">
+        <div class="name">Concrete Jungle</div>
+        <div class="where">down the avenues, after dark</div>
       </div>
     </div>
     <div class="roster">
