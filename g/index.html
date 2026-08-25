@@ -14,6 +14,21 @@
 <meta property="og:description" content="Play your hole, send it, and it rides along in the bubble. Nine courses, three formats, endless needle.">
 <meta property="og:url" content="https://mountainmediadigital.com/g/">
 <meta property="og:site_name" content="Mountain Media Digital">
+<meta property="og:image" content="https://mountainmediadigital.com/g/og-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A golfer on the tee at Coral Cay, mountains behind, with the G mark.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="G · Golf duels in iMessage">
+<meta name="twitter:description" content="Play your hole, send it, and it rides along in the bubble. Nine courses, three formats, endless needle.">
+<meta name="twitter:image" content="https://mountainmediadigital.com/g/og-card.jpg">
+
+<link rel="canonical" href="https://mountainmediadigital.com/g/">
+<link rel="icon" href="/g/favicon-32.png" sizes="32x32">
+<link rel="icon" href="/g/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="/g/apple-touch-icon.png">
+<meta name="theme-color" content="#0f6b4f">
 
 
 <style>
@@ -187,6 +202,8 @@
   .fmt { background: var(--cream); border-radius: 18px; padding: 28px 26px; }
   .fmt h3 { font-family: var(--serif); font-size: 25px; color: var(--green); margin-bottom: 8px; }
   .fmt p { font-size: 15px; color: #4c5b53; font-weight: 300; line-height: 1.55; }
+  .screen video { cursor: pointer; }
+  .screen video:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
   /* GLYPHS:START */
   /* ── Extruded glyphs ──────────────────────────────────────────────
      The app spins these in SceneKit: one bezier extruded along Z,
@@ -307,13 +324,17 @@
     <div class="film-grid">
       <div class="plate">
         <div class="screen">
-          <video src="flyover.mp4" autoplay muted loop playsinline preload="auto"></video>
+          <video data-src="flyover.mp4" poster="p-flyover.jpg" muted loop playsinline
+                 preload="metadata" tabindex="0" role="button"
+                 aria-label="Gameplay clip. Activate to play or pause."></video>
         </div>
         <p class="cap">No. 1 at Coral Cay. Every hole opens with a flyover.</p>
       </div>
       <div class="plate">
         <div class="screen">
-          <video src="drive.mp4" autoplay muted loop playsinline preload="auto"></video>
+          <video data-src="drive.mp4" poster="p-drive.jpg" muted loop playsinline
+                 preload="metadata" tabindex="0" role="button"
+                 aria-label="Gameplay clip. Activate to play or pause."></video>
         </div>
         <p class="cap">One flick up the screen. Pure it and the camera rides with the ball.</p>
       </div>
@@ -550,6 +571,63 @@
   </div>
 
 </div>
+
+
+<script>
+(function () {
+  var quiet = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var clips = Array.prototype.slice.call(document.querySelectorAll('.screen video'));
+  if (!clips.length) { return; }
+
+  function onScreen(v) {
+    var r = v.getBoundingClientRect();
+    if (!r.height) { return false; }
+    var top = Math.max(r.top, 0);
+    var bot = Math.min(r.bottom, window.innerHeight || 0);
+    return (bot - top) / r.height > 0.25;
+  }
+
+  // A clip is a few hundred KB, so its src is withheld until it is
+  // actually on screen, and it pauses again once it scrolls away.
+  // Plain rect maths rather than IntersectionObserver: fewer moving
+  // parts, and it behaves the same everywhere.
+  function settle() {
+    clips.forEach(function (v) {
+      var here = onScreen(v);
+      if (here && !v.src && v.dataset.src) { v.src = v.dataset.src; }
+      if (here && !quiet.matches) {
+        if (v.paused) { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
+      } else if (!v.paused) {
+        v.pause();
+      }
+    });
+  }
+
+  // settle() is two getBoundingClientRect calls, cheap enough to run
+  // straight off the scroll. No rAF or IntersectionObserver gate: if
+  // either is throttled (a backgrounded tab, say) the clips would never
+  // load at all, and the clips are the point of the page.
+  addEventListener('scroll', settle, { passive: true });
+  addEventListener('resize', settle);
+  addEventListener('load', settle);
+  if (quiet.addEventListener) { quiet.addEventListener('change', settle); }
+  settle();
+
+  // Two looping clips with no controls fail WCAG 2.2.2 on their own.
+  clips.forEach(function (v) {
+    function toggle(e) {
+      e.preventDefault();
+      if (!v.src && v.dataset.src) { v.src = v.dataset.src; }
+      if (v.paused) { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
+      else { v.pause(); }
+    }
+    v.addEventListener('click', toggle);
+    v.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter' || e.key === 'Spacebar') { toggle(e); }
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
