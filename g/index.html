@@ -12,9 +12,6 @@
 <meta property="og:url" content="https://mountainmediadigital.com/g/">
 <meta property="og:site_name" content="Mountain Media Digital">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Inconsolata:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -30,9 +27,14 @@
     --green-d: #0b4f3b;
     --pink:    #f2a9c4;
 
-    --sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    --serif:   'Playfair Display', Georgia, 'Times New Roman', serif;
+    /* The game's two voices, from Shared/TypeRamp.swift: SF Pro carries
+       information, New York marks the moments. Both ship with Apple's
+       operating systems, so they are asked for by system keyword rather
+       than served: Apple's font licence does not allow us to host them.
+       Safari resolves ui-serif to New York; other browsers take Georgia. */
+    --sans:    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono:    ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+    --serif:   ui-serif, 'New York', Georgia, 'Times New Roman', serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -88,7 +90,9 @@
   .mark { width: 84px; margin-bottom: 26px; filter: brightness(0) invert(1); }
   .hero h1 {
     font-family: var(--serif);
-    font-weight: 700;
+    /* The game's ramp has no bold anywhere: serif moments are semibold
+       (Shared/TypeRamp.swift). New York Semibold is the display face. */
+    font-weight: 600;
     font-size: clamp(40px, 6.6vw, 80px);
     line-height: 1.0;
     letter-spacing: -0.02em;
@@ -184,7 +188,7 @@
   .fmt { background: var(--cream); border-radius: 18px; padding: 28px 26px; }
   .fmt h3 { font-family: var(--serif); font-size: 25px; color: var(--green); margin-bottom: 8px; }
   .fmt p { font-size: 15px; color: #4c5b53; font-weight: 300; line-height: 1.55; }
-
+  /* GLYPHS:START */
   /* ── Extruded glyphs ──────────────────────────────────────────────
      The app spins these in SceneKit: one bezier extruded along Z,
      pennant-pink faces, deeper walls, a slow turn about Y. The browser
@@ -222,6 +226,8 @@
   /* The section's own mark. It leads the eyebrow, so it lines up with
      the text column rather than floating centered over left-set type. */
   .sec > .gl { margin: 0 0 20px; }
+  /* GLYPHS:END */
+
 
 
   /* PULLQUOTE */
@@ -245,12 +251,13 @@
 </style>
 </head>
 <body>
+<!-- GLYPHS:START -->
 <svg class="gl-defs" aria-hidden="true" focusable="false"><defs>
     <path id="gl-bubble" fill-rule="evenodd" d="M-0.62 -1.1 H0.62 A0.48 0.48 0 0 1 1.1 -0.62 V0.62 A0.48 0.48 0 0 1 0.62 1.1 H-0.62 A0.48 0.48 0 0 1 -1.1 0.62 V-0.62 A0.48 0.48 0 0 1 -0.62 -1.1 Z M0.66 -0.10 C0.66 -0.40 0.36 -0.65 0 -0.65 C-0.36 -0.65 -0.66 -0.40 -0.66 -0.10 C-0.66 0.15 -0.60 0.22 -0.50 0.30 C-0.52 0.42 -0.54 0.55 -0.62 0.66 C-0.40 0.60 -0.28 0.45 0 0.45 C0.36 0.45 0.66 0.20 0.66 -0.10 Z"/>
     <mask id="gl-coin-mask" maskUnits="userSpaceOnUse"
           x="-2.02" y="-2.02" width="4.04" height="4.04">
       <circle cx="0" cy="0" r="1.15" fill="#fff"/>
-      <text x="0" y="0" fill="#000" font-family="'Playfair Display',Georgia,serif"
+      <text x="0" y="0" fill="#000" font-family="ui-serif,'New York',Georgia,serif"
             font-weight="600" font-size="1.72" text-anchor="middle"
             dominant-baseline="central">G</text>
     </mask>
@@ -269,6 +276,7 @@
       </g>
     </g>
 </defs></svg>
+<!-- GLYPHS:END -->
 <div class="page">
 
   <div class="top">
@@ -397,6 +405,7 @@
     </p>
     <div class="formats">
       <div class="fmt">
+        <!-- GLYPHS:START -->
         <div class="gl gl-stroke" style="--turn:9s" aria-hidden="true">
           <div class="gl-spin">
           <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-4.31px" aria-hidden="true"><use href="#gl-stroke"/></svg>
@@ -416,10 +425,12 @@
           <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:4.31px" aria-hidden="true"><use href="#gl-stroke"/></svg>
           </div>
         </div>
+        <!-- GLYPHS:END -->
         <h3>Stroke</h3>
         <p>Lowest total wins the round. The honest one.</p>
       </div>
       <div class="fmt">
+        <!-- GLYPHS:START -->
         <div class="gl gl-match" style="--turn:9s" aria-hidden="true">
           <div class="gl-spin">
           <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-4.31px" aria-hidden="true"><use href="#gl-match"/></svg>
@@ -439,10 +450,12 @@
           <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:4.31px" aria-hidden="true"><use href="#gl-match"/></svg>
           </div>
         </div>
+        <!-- GLYPHS:END -->
         <h3>Match</h3>
         <p>Hole by hole. Go three up with two to play and it's over early, dormie and all.</p>
       </div>
       <div class="fmt">
+        <!-- GLYPHS:START -->
         <div class="gl gl-coin" style="--turn:8.4s" aria-hidden="true">
           <div class="gl-spin">
           <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.16px" aria-hidden="true"><use href="#gl-coin"/></svg>
@@ -459,6 +472,7 @@
           <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.16px" aria-hidden="true"><use href="#gl-coin"/></svg>
           </div>
         </div>
+        <!-- GLYPHS:END -->
         <h3>Skins</h3>
         <p>Every hole is its own pot. Tie it and the pot carries. The pressure stacks up fast.</p>
       </div>
@@ -473,6 +487,7 @@
 
   <!-- IN THE THREAD -->
   <section class="sec">
+    <!-- GLYPHS:START -->
     <div class="gl gl-bubble" style="--turn:9s" aria-hidden="true">
       <div class="gl-spin">
       <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-6.46px" aria-hidden="true"><use href="#gl-bubble"/></svg>
@@ -500,6 +515,7 @@
       <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:6.46px" aria-hidden="true"><use href="#gl-bubble"/></svg>
       </div>
     </div>
+    <!-- GLYPHS:END -->
     <div class="eyebrow">In the thread</div>
     <h2>It looks like a message, because it is one.</h2>
     <p class="lede">
