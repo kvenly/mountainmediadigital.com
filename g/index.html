@@ -94,7 +94,7 @@
     position: relative; isolation: isolate;
     margin: 0 -40px; padding: 96px 40px 104px;
     border-bottom: 1px solid var(--rule);
-    background-color: #123a6b;
+    background-color: var(--green);   /* only shows if the art fails */
     background-position: center 45%;
     background-size: cover;
     background-repeat: no-repeat;
@@ -117,8 +117,11 @@
   @media (max-width: 600px) { .hero { margin: 0 -20px; padding: 64px 20px 76px; } }
   .hero::after {
     content: ''; position: absolute; inset: 0; z-index: -1;
+    /* The scrim is the page's own colour decision, so it is clubhouse
+       green rather than the navy it used to be. It carries the dusk sky
+       toward the brand and hands off to the green film band below. */
     background: linear-gradient(180deg,
-      rgba(8,26,52,.70) 0%, rgba(8,26,52,.40) 48%, rgba(8,26,52,.28) 100%);
+      rgba(5,41,30,.72) 0%, rgba(6,51,37,.42) 48%, rgba(6,51,37,.30) 100%);
   }
   .mark { width: 84px; margin-bottom: 26px; filter: brightness(0) invert(1); }
   .hero h1 {
@@ -137,6 +140,9 @@
     font-size: clamp(17px, 2.1vw, 21px);
     line-height: 1.5;
     color: rgba(255,255,255,.9);
+    /* The h1 carries a shadow; this sits lower, over pale fairway, and
+       needs one more than the headline does. */
+    text-shadow: 0 1px 18px rgba(4,26,18,.55);
     max-width: 40ch;
     font-weight: 300;
     text-wrap: pretty;
