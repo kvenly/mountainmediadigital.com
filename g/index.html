@@ -94,8 +94,25 @@
     position: relative; isolation: isolate;
     margin: 0 -40px; padding: 96px 40px 104px;
     border-bottom: 1px solid var(--rule);
-    background: #123a6b url('hero-lakepines.jpg') center 45% / cover no-repeat;
+    background-color: #123a6b;
+    background-position: center 45%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* Flat-shaded art compresses hard: the WebP is a quarter of the
+       JPEG's weight. The plain url() stays first as the fallback for
+       anything that cannot parse image-set; only the winning
+       declaration is ever fetched. */
+    background-image: url('hero-lakepines.jpg');
+    background-image: image-set(url('hero-sm.webp') type('image/webp'),
+                                url('hero-sm.jpg') type('image/jpeg'));
     color: #fff;
+  }
+  @media (min-width: 701px) {
+    .hero {
+      background-image: url('hero-lakepines.jpg');
+      background-image: image-set(url('hero-lakepines.webp') type('image/webp'),
+                                  url('hero-lakepines.jpg') type('image/jpeg'));
+    }
   }
   @media (max-width: 600px) { .hero { margin: 0 -20px; padding: 64px 20px 76px; } }
   .hero::after {
@@ -292,6 +309,43 @@
   }
   .foot nav { display: flex; gap: 24px; }
 </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "G",
+  "applicationCategory": "GameApplication",
+  "applicationSubCategory": "Sports Game",
+  "operatingSystem": "iOS",
+  "url": "https://mountainmediadigital.com/g/",
+  "image": "https://mountainmediadigital.com/g/og-card.jpg",
+  "description": "Asynchronous head-to-head golf played inside an iMessage conversation. Play your hole, send it, and your friend plays the same hole and sends it back. Nine courses, three formats.",
+  "featureList": [
+    "Play inside an iMessage thread",
+    "Nine courses",
+    "Stroke, Match and Skins",
+    "Ghost replay of your rival's shots"
+  ],
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Free to play, with optional in-app purchases."
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mountain Media Digital LLC",
+    "url": "https://mountainmediadigital.com/",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "La Conner",
+      "addressRegion": "WA",
+      "addressCountry": "US"
+    }
+  }
+}
+</script>
 </head>
 <body>
 <!-- GLYPHS:START -->
@@ -405,32 +459,50 @@
     </p>
     <div class="courses">
       <div class="course">
-        <img src="w-coralcay.jpg" alt="Coral Cay" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="w-coralcay.webp">
+          <img src="w-coralcay.jpg" alt="Coral Cay" loading="lazy">
+        </picture>
         <div class="name">Coral Cay</div>
         <div class="where">island target golf, open sea</div>
       </div>
       <div class="course">
-        <img src="w-canyonrun.jpg" alt="Canyon Run" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="w-canyonrun.webp">
+          <img src="w-canyonrun.jpg" alt="Canyon Run" loading="lazy">
+        </picture>
         <div class="name">Canyon Run</div>
         <div class="where">red rock and cactus</div>
       </div>
       <div class="course">
-        <img src="w-sheepranch.jpg" alt="Sheep Ranch" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="w-sheepranch.webp">
+          <img src="w-sheepranch.jpg" alt="Sheep Ranch" loading="lazy">
+        </picture>
         <div class="name">Sheep Ranch</div>
         <div class="where">dunes at golden hour</div>
       </div>
       <div class="course">
-        <img src="w-grassroots.jpg" alt="Grassroots" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="w-grassroots.webp">
+          <img src="w-grassroots.jpg" alt="Grassroots" loading="lazy">
+        </picture>
         <div class="name">Grassroots</div>
         <div class="where">ant height in the backyard</div>
       </div>
       <div class="course">
-        <img src="w-gnomehollow.jpg" alt="Gnome Hollow" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="w-gnomehollow.webp">
+          <img src="w-gnomehollow.jpg" alt="Gnome Hollow" loading="lazy">
+        </picture>
         <div class="name">Gnome Hollow</div>
         <div class="where">cottages, and steady rain</div>
       </div>
       <div class="course">
-        <img src="w-concretejungle.jpg" alt="Concrete Jungle" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="w-concretejungle.webp">
+          <img src="w-concretejungle.jpg" alt="Concrete Jungle" loading="lazy">
+        </picture>
         <div class="name">Concrete Jungle</div>
         <div class="where">down the avenues, after dark</div>
       </div>
@@ -573,15 +645,24 @@
     </p>
     <div class="film-grid">
       <div class="plate">
-        <div class="screen"><img src="t-invite.jpg" alt="The G app open in an iMessage conversation" loading="lazy"></div>
+        <div class="screen"><picture>
+  <source type="image/webp" srcset="t-invite.webp">
+  <img src="t-invite.jpg" alt="The G app open in an iMessage conversation" loading="lazy">
+</picture></div>
         <p class="cap">Tap the apps button in any thread and pick the G.</p>
       </div>
       <div class="plate">
-        <div class="screen"><img src="t-bubble.jpg" alt="A finished hole waiting to send in the message field" loading="lazy"></div>
+        <div class="screen"><picture>
+  <source type="image/webp" srcset="t-bubble.webp">
+  <img src="t-bubble.jpg" alt="A finished hole waiting to send in the message field" loading="lazy">
+</picture></div>
         <p class="cap">Your hole becomes the message. Send it and the ball is in their court.</p>
       </div>
       <div class="plate">
-        <div class="screen"><img src="t-replay.jpg" alt="A ghost replay of the opponent's round" loading="lazy"></div>
+        <div class="screen"><picture>
+  <source type="image/webp" srcset="t-replay.webp">
+  <img src="t-replay.jpg" alt="A ghost replay of the opponent's round" loading="lazy">
+</picture></div>
         <p class="cap">They open it and watch your round play out before taking their turn.</p>
       </div>
     </div>
