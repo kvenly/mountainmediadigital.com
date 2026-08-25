@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <title>G · Golf duels in iMessage</title>
 <meta name="description" content="G is asynchronous golf for iMessage. Play your hole, send it, and your friend plays the same one. Nine courses, three formats, no schedules.">
 
@@ -27,14 +30,12 @@
     --green-d: #0b4f3b;
     --pink:    #f2a9c4;
 
-    /* The game's two voices, from Shared/TypeRamp.swift: SF Pro carries
-       information, New York marks the moments. Both ship with Apple's
-       operating systems, so they are asked for by system keyword rather
-       than served: Apple's font licence does not allow us to host them.
-       Safari resolves ui-serif to New York; other browsers take Georgia. */
+    /* Playfair and Inconsolata are the site's own voices. The sans rides
+       the system stack: the game's SF Pro on Apple, and Inter was an SF
+       lookalike anyway, so this matches without downloading a thing. */
     --sans:    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --mono:    ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
-    --serif:   ui-serif, 'New York', Georgia, 'Times New Roman', serif;
+    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --serif:   'Playfair Display', Georgia, 'Times New Roman', serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -90,9 +91,7 @@
   .mark { width: 84px; margin-bottom: 26px; filter: brightness(0) invert(1); }
   .hero h1 {
     font-family: var(--serif);
-    /* The game's ramp has no bold anywhere: serif moments are semibold
-       (Shared/TypeRamp.swift). New York Semibold is the display face. */
-    font-weight: 600;
+    font-weight: 700;
     font-size: clamp(40px, 6.6vw, 80px);
     line-height: 1.0;
     letter-spacing: -0.02em;
@@ -257,7 +256,7 @@
     <mask id="gl-coin-mask" maskUnits="userSpaceOnUse"
           x="-2.02" y="-2.02" width="4.04" height="4.04">
       <circle cx="0" cy="0" r="1.15" fill="#fff"/>
-      <text x="0" y="0" fill="#000" font-family="ui-serif,'New York',Georgia,serif"
+      <text x="0" y="0" fill="#000" font-family="'Playfair Display',Georgia,serif"
             font-weight="600" font-size="1.72" text-anchor="middle"
             dominant-baseline="central">G</text>
     </mask>
