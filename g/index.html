@@ -259,6 +259,33 @@
   .pull .who::before { content: ''; width: 26px; height: 1px; background: currentColor; opacity: 0.55; }
 
   /* FOOT */
+  /* THE CLOSE: a green band bookending the hero, and the only ask on
+     the page. It hands you a half-written message, which is the same
+     move the game makes. */
+  .close {
+    margin: 0 -40px; padding: 84px 40px 88px;
+    background: var(--green); color: var(--cream);
+    text-align: center;
+  }
+  @media (max-width: 600px) { .close { margin: 0 -20px; padding: 60px 20px 64px; } }
+  .close .mark { width: 66px; margin: 0 auto 24px; }
+  .close h2 {
+    font-family: var(--serif); font-weight: 700;
+    font-size: clamp(30px, 4.4vw, 46px); line-height: 1.08;
+    letter-spacing: -0.015em; color: var(--cream);
+    max-width: 18ch; margin: 0 auto; text-wrap: balance;
+  }
+  .close p {
+    margin: 18px auto 0; max-width: 40ch;
+    font-size: 17px; font-weight: 300; line-height: 1.6;
+    color: rgba(246,239,216,.82); text-wrap: pretty;
+  }
+  .close .badges { margin-top: 32px; justify-content: center; }
+  .close .cta { background: var(--cream); color: var(--green); border: 0; cursor: pointer;
+                font-family: var(--sans); }
+  .close .cta:hover { background: #fff; color: var(--green-d); }
+  .close .cta-note { color: rgba(246,239,216,.66); }
+
   .foot {
     padding: 48px 0 8px; display: flex; justify-content: space-between;
     flex-wrap: wrap; gap: 18px; font-size: 14px; color: var(--fg-dim);
@@ -560,6 +587,20 @@
     </div>
   </section>
 
+  <!-- THE CLOSE -->
+  <section class="close">
+    <img class="mark" src="g-mark.svg" alt="G">
+    <h2>Someone in your messages owes you a round.</h2>
+    <p>
+      Send them the link. When it opens, the round starts in a thread
+      you already have.
+    </p>
+    <div class="badges">
+      <a class="cta" id="share" href="sms:&amp;body=Golf%20you%20play%20inside%20a%20text.%20https%3A%2F%2Fmountainmediadigital.com%2Fg%2F">Send it to someone</a>
+      <span class="cta-note">iPhone · coming to the App Store</span>
+    </div>
+  </section>
+
   <div class="foot">
     <div>© 2026 Mountain Media Digital LLC</div>
     <nav>
@@ -612,6 +653,22 @@
   addEventListener('load', settle);
   if (quiet.addEventListener) { quiet.addEventListener('change', settle); }
   settle();
+
+  // The close hands you a half-written message. The href is an sms:
+  // link so it works with no script at all on an iPhone or a Mac; where
+  // the share sheet exists (Android, desktop) prefer that, since sms:
+  // is a dead end on those.
+  var share = document.getElementById('share');
+  if (share && navigator.share) {
+    share.addEventListener('click', function (e) {
+      e.preventDefault();
+      navigator.share({
+        title: 'G',
+        text: 'Golf you play inside a text.',
+        url: 'https://mountainmediadigital.com/g/'
+      }).catch(function () {});
+    });
+  }
 
   // Two looping clips with no controls fail WCAG 2.2.2 on their own.
   clips.forEach(function (v) {
