@@ -183,10 +183,16 @@
   }
   @media (max-width: 600px) { .film h2 { margin-bottom: 34px; } }
   .film-grid {
-    display: flex; flex-wrap: wrap; gap: 40px 64px;
+    display: flex; flex-wrap: wrap; gap: 40px 56px;
     justify-content: center; align-items: flex-start;
   }
-  .plate { width: 320px; max-width: 78vw; }
+  /* Only the film pair gets the wider gutter; the thread runs three
+     across and needs every pixel to stay on one line. */
+  .film .film-grid { gap: 40px 64px; }
+  /* The thread grid runs three across and must still fit; only the film
+     pair gets the larger handset. */
+  .plate { width: 274px; max-width: 78vw; }
+  .film .plate { width: 320px; }
   /* Drop the second handset so the pair reads as a still from a reel,
      not a matched pair of thumbnails. */
   .film .plate:nth-child(2) { margin-top: 56px; }
@@ -238,8 +244,12 @@
   .course img { border-radius: 14px; background: var(--cream); aspect-ratio: 3/2; object-fit: cover; }
   .course .name { font-size: 15px; font-weight: 600; margin-top: 12px; }
   .course .where { font-family: var(--mono); font-size: 12.5px; color: var(--fg-mute); margin-top: 2px; }
+  .roster-lead {
+    margin-top: 40px; font-family: var(--mono); font-size: 12px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-mute);
+  }
   .roster {
-    margin-top: 40px; display: flex; flex-wrap: wrap; gap: 8px 10px;
+    margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px;
     font-family: var(--mono); font-size: 13.5px; color: var(--fg-dim);
   }
   .roster span { background: var(--cream); padding: 6px 13px; border-radius: 999px; }
@@ -427,7 +437,7 @@
     </p>
     <div class="badges">
       <a class="cta" href="#how">See how it plays</a>
-      <span class="cta-note">iPhone · coming to the App Store</span>
+      <span class="cta-note">iPhone and iPad · coming to the App Store</span>
     </div>
   </section>
 
@@ -461,7 +471,7 @@
     <h2>One hole. Back and forth.</h2>
     <p class="lede">
       G is an iMessage app, so a round is just a conversation you're already having.
-      Nothing to schedule, nothing to install for the person you're playing.
+      Nothing to schedule, and no separate app to open: you both play in the thread.
     </p>
     <div class="steps">
       <div class="step">
@@ -540,6 +550,7 @@
         <div class="where">down the avenues, after dark</div>
       </div>
     </div>
+    <div class="roster-lead">The full nine</div>
     <div class="roster">
       <span>The Gyre</span><span>Lake Pines</span><span>Canyon Run</span>
       <span>Coral Cay</span><span>Grassroots</span><span>Gnome Hollow</span>
@@ -671,10 +682,8 @@
     <div class="eyebrow">In the thread</div>
     <h2>It looks like a message, because it is one.</h2>
     <p class="lede">
-      No app to open, no lobby to join. The match rides in the bubble: you play
-      your hole and send it, they watch your shots replay over their own ground,
-      then play it their way and send it back. Every course is free when a friend
-      invites you.
+      Every course is free when a friend invites you. Owning one is what lets
+      you start the match on it.
     </p>
     <div class="film-grid">
       <div class="plate">
@@ -706,12 +715,12 @@
     <img class="mark" src="g-mark.svg" alt="G">
     <h2>Someone in your messages owes you a round.</h2>
     <p>
-      Send them the link. When it opens, the round starts in a thread
+      Send them the link. The day G opens, the round starts in a thread
       you already have.
     </p>
     <div class="badges">
       <a class="cta" id="share" href="sms:&amp;body=Golf%20you%20play%20inside%20a%20text.%20https%3A%2F%2Fmountainmediadigital.com%2Fg%2F">Send it to someone</a>
-      <span class="cta-note">iPhone · coming to the App Store</span>
+      <span class="cta-note">iPhone and iPad · coming to the App Store</span>
     </div>
   </section>
 
