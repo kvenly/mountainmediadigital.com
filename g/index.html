@@ -152,6 +152,9 @@
   .hero .cta:hover { background: #fff; color: var(--green-d); }
   .hero .cta-note { color: rgba(255,255,255,.74); }
   .badges { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  /* Two buttons now, so the note takes its own line rather than
+     crowding in beside them. */
+  .badges .cta-note { flex-basis: 100%; margin-top: 2px; }
   .cta {
     display: inline-flex; align-items: center; gap: 9px;
     background: var(--green); color: var(--cream);
@@ -160,6 +163,20 @@
   }
   .cta:hover { background: var(--green-d); color: var(--cream); }
   .cta-note { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); }
+  /* Secondary action. The App Store link leads now that G is out, so
+     this one steps back to an outline. */
+  .cta.quiet { background: transparent; color: var(--green); box-shadow: inset 0 0 0 1px currentColor; }
+  .cta.quiet:hover { background: var(--green); color: var(--cream); box-shadow: none; }
+  /* The close section defines its own .cta later in the file, so this
+     pair must restate the background or it inherits a cream fill and
+     the cream label disappears into it. */
+  .hero .cta.quiet, .close .cta.quiet {
+    background: transparent; color: var(--cream);
+    box-shadow: inset 0 0 0 1px var(--cream);
+  }
+  .hero .cta.quiet:hover, .close .cta.quiet:hover {
+    background: var(--cream); color: var(--green); box-shadow: none;
+  }
 
   /* FILM STRIP: phone-shaped media, shown at phone scale.
      A full-bleed band in the game's own night sky, so the two handsets
@@ -360,6 +377,7 @@
   "applicationSubCategory": "Sports Game",
   "operatingSystem": "iOS",
   "url": "https://mountainmediadigital.com/g/",
+  "downloadUrl": "https://apps.apple.com/us/app/golf-game-g/id6790259018",
   "image": "https://mountainmediadigital.com/g/og-card.jpg",
   "description": "Asynchronous head-to-head golf played inside an iMessage conversation. Play your hole, send it, and your friend plays the same hole and sends it back. Nine courses, three formats.",
   "featureList": [
@@ -436,8 +454,9 @@
       back, inside the conversation you're already having.
     </p>
     <div class="badges">
-      <a class="cta" href="#how">See how it plays</a>
-      <span class="cta-note">iPhone and iPad · coming to the App Store</span>
+      <a class="cta" href="https://apps.apple.com/us/app/golf-game-g/id6790259018">Get G on the App Store</a>
+      <a class="cta quiet" href="#how">See how it plays</a>
+      <span class="cta-note">Free on iPhone and iPad</span>
     </div>
   </section>
 
@@ -715,12 +734,12 @@
     <img class="mark" src="g-mark.svg" alt="G">
     <h2>Someone in your messages owes you a round.</h2>
     <p>
-      Tell them it's coming. The first hole is a message they open
-      whenever.
+      Send them a hole. The first one is a message they open whenever.
     </p>
     <div class="badges">
-      <a class="cta" id="share" href="sms:&amp;body=Golf%20you%20play%20inside%20a%20text.%20https%3A%2F%2Fmountainmediadigital.com%2Fg%2F">Send it to someone</a>
-      <span class="cta-note">iPhone and iPad · coming to the App Store</span>
+      <a class="cta" href="https://apps.apple.com/us/app/golf-game-g/id6790259018">Get G on the App Store</a>
+      <a class="cta quiet" id="share" href="sms:&amp;body=Golf%20you%20play%20inside%20a%20text.%20https%3A%2F%2Fapps.apple.com%2Fus%2Fapp%2Fgolf-game-g%2Fid6790259018">Send it to someone</a>
+      <span class="cta-note">Free on iPhone and iPad</span>
     </div>
   </section>
 
@@ -788,7 +807,7 @@
       navigator.share({
         title: 'G',
         text: 'Golf you play inside a text.',
-        url: 'https://mountainmediadigital.com/g/'
+        url: 'https://apps.apple.com/us/app/golf-game-g/id6790259018'
       }).catch(function () {});
     });
   }
