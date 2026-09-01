@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skagit Valley Web Design, Branding & App Development — Mountain Media Digital LLC</title>
+<meta name="description" content="A local design and software studio in La Conner serving businesses across the Skagit Valley: Mount Vernon, Burlington, Anacortes, Sedro-Woolley. Branding, websites, signage, and custom apps. Free 30-minute consultation.">
+
+<link rel="canonical" href="https://mountainmediadigital.com/skagit-valley/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Skagit Valley Web Design, Branding & App Development">
+<meta property="og:description" content="A local design and software studio in La Conner. Serving businesses across the Skagit Valley. Free 30-minute consultation.">
+<meta property="og:url" content="https://mountainmediadigital.com/skagit-valley/">
+<meta property="og:site_name" content="Mountain Media Digital">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": "https://mountainmediadigital.com/#organization",
+  "name": "Mountain Media Digital LLC",
+  "url": "https://mountainmediadigital.com/skagit-valley/",
+  "email": "hello@mountainmediadigital.com",
+  "founder": { "@type": "Person", "name": "Keven Thompson" },
+  "foundingDate": "2026",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "La Conner",
+    "addressRegion": "WA",
+    "postalCode": "98257",
+    "addressCountry": "US"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 48.3922, "longitude": -122.4972 },
+  "areaServed": [
+    { "@type": "City", "name": "La Conner" },
+    { "@type": "City", "name": "Mount Vernon" },
+    { "@type": "City", "name": "Burlington" },
+    { "@type": "City", "name": "Anacortes" },
+    { "@type": "City", "name": "Sedro-Woolley" },
+    { "@type": "AdministrativeArea", "name": "Skagit County" }
+  ],
+  "makesOffer": [
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Branding and Visual Identity" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website Design and Local SEO" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Signage and Vehicle Wraps" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom App Design and Development" } }
+  ],
+  "priceRange": "$$",
+  "sameAs": ["https://www.kevmo.me", "https://passchecker.app"]
+}
+</script>
+
+<style>
+  :root {
+    --bg:      #fafafa;
+    --fg:      #000000;
+    --fg-dim:  #6a6a6a;
+    --fg-mute: #a8a8a8;
+    --rule:    #e5e5e5;
+    --sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--fg); text-decoration: none; }
+  a:hover { color: var(--fg-dim); }
+  ::selection { background: var(--fg); color: var(--bg); }
+
+  .page { padding: 32px 40px; }
+  @media (max-width: 600px) { .page { padding: 20px; } }
+
+  /* TOP STRIP */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+    color: var(--fg-dim);
+  }
+  .top .meta span { color: var(--fg-mute); padding: 0 4px; }
+  .top nav { display: flex; gap: 28px; }
+  .top nav a { color: var(--fg); }
+  @media (max-width: 600px) {
+    .top { flex-direction: column; gap: 12px; align-items: flex-start; font-size: 13px; }
+    .top nav { gap: 18px; }
+  }
+
+  /* HERO */
+  .hero {
+    padding: 56px 0 96px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: stretch;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; gap: 32px; padding: 40px 0 64px; }
+  }
+
+  .wordmark {
+    font-family: var(--sans);
+    font-weight: 900;
+    font-size: clamp(3.5rem, 9vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--fg);
+  }
+  .wordmark .sub {
+    display: block;
+    font-weight: 400;
+    font-size: clamp(1rem, 1.4vw, 1.25rem);
+    color: var(--fg-dim);
+    letter-spacing: -0.01em;
+    margin-top: 18px;
+    line-height: 1.45;
+    max-width: 34ch;
+  }
+
+  .ascii {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 9px;
+    line-height: 1.0;
+    color: var(--fg);
+    white-space: pre;
+    margin: 0;
+    overflow: hidden;
+    letter-spacing: 0;
+    user-select: none;
+  }
+  .hero-ascii {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    overflow: hidden;
+  }
+  .hero-ascii video,
+  .hero-ascii canvas { display: none; }
+  @media (max-width: 820px) {
+    .hero-ascii { height: auto; aspect-ratio: 16 / 10; min-height: 0; }
+  }
+
+  /* SECTIONS */
+  section { padding: 96px 0; border-bottom: 1px solid var(--rule); }
+  @media (max-width: 600px) { section { padding: 64px 0; } }
+
+  .row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .row { grid-template-columns: 1fr; gap: 16px; }
+  }
+
+  .label {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--fg-dim);
+    letter-spacing: -0.005em;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: var(--fg);
+    max-width: 24ch;
+  }
+
+  .lede {
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.45;
+    color: var(--fg);
+    max-width: 56ch;
+  }
+  .lede + .lede { margin-top: 1em; color: var(--fg-dim); }
+
+  /* AUDIENCE (two-column split under "Who this is for") */
+  .audience {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  @media (max-width: 820px) {
+    .audience { grid-template-columns: 1fr; gap: 32px; }
+  }
+  .audience .kind {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg-mute);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .audience .lede { max-width: none; }
+
+  /* SERVICES */
+  .services { list-style: none; margin-top: 48px; }
+  .services li {
+    border-top: 1px solid var(--rule);
+    padding: 24px 0;
+    display: grid;
+    grid-template-columns: 48px 1fr 1.4fr;
+    gap: 32px;
+    align-items: baseline;
+  }
+  .services li:last-child { border-bottom: 1px solid var(--rule); }
+  .services .n {
+    font-size: 14px;
+    color: var(--fg-mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .services .t {
+    font-weight: 600;
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  .services .d {
+    font-size: 15px;
+    color: var(--fg-dim);
+    line-height: 1.55;
+    max-width: 56ch;
+  }
+  @media (max-width: 720px) {
+    .services li { grid-template-columns: 32px 1fr; gap: 12px; padding: 20px 0; }
+    .services .d { grid-column: 2; margin-top: 6px; }
+  }
+
+  /* CTA */
+  .cta-lede {
+    max-width: 56ch;
+    margin-top: 24px;
+    color: var(--fg);
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+  .cta-email {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: clamp(1.25rem, 4.5vw, 3.5rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    margin-top: 40px;
+  }
+  .cta-email a {
+    color: var(--fg);
+    border-bottom: 2px solid var(--fg);
+    padding-bottom: 4px;
+  }
+  .cta-email a:hover { color: var(--fg-dim); border-bottom-color: var(--fg-dim); }
+
+  /* FOOTER */
+  footer {
+    padding: 28px 0 0;
+    font-size: 13px;
+    color: var(--fg-mute);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer a { color: var(--fg-dim); }
+  footer a:hover { color: var(--fg); }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+
+  /* HAIRLINE DRAW-IN */
+  .top, .hero, section { position: relative; border-bottom-color: transparent; }
+  .top::after, .hero::after, section::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 1px; background: var(--rule);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .in-view::after { transform: scaleX(1); }
+
+  /* DIRECTION-AWARE MICRO SHADOW */
+  :root { --ms-x: 0px; --ms-y: 0px; }
+  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.18); }
+  .lede, .services .d, .cta-lede, .ascii { text-shadow: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .top::after, .hero::after, section::after { transform: scaleX(1); }
+    body { text-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="top">
+    <div class="meta">Mountain Media Digital LLC<span>/</span>La Conner, WA<span>/</span>Skagit Valley</div>
+    <nav>
+      <a href="/">Studio</a>
+      <a href="#services">Services</a>
+      <a href="#approach">Approach</a>
+      <a href="#talk">Talk</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <div>
+      <h1 class="wordmark">
+        For<br>Skagit<br>Valley.
+        <span class="sub">A design and software studio in La Conner, working with businesses across Mount Vernon, Burlington, Anacortes, Sedro-Woolley, and greater Skagit County.</span>
+      </h1>
+    </div>
+    <figure class="hero-ascii" aria-label="Mountain range rendered as live ASCII art">
+      <video id="hero-vid" src="/mountain.mp4" autoplay loop muted playsinline preload="auto" aria-hidden="true"></video>
+      <pre id="hero-out" class="ascii"></pre>
+      <canvas id="hero-sample" aria-hidden="true"></canvas>
+    </figure>
+  </header>
+
+  <section id="who">
+    <div class="row">
+      <div class="label">Who this is for</div>
+      <div>
+        <h2>Two kinds of Skagit Valley businesses.</h2>
+        <div class="audience">
+          <div>
+            <div class="kind">Small local businesses</div>
+            <p class="lede">Trades, restaurants, retail, service companies. Everyone who needs a logo that reads on a business card and a vehicle wrap, a website that generates leads, and signage that works at 40 mph on Highway 20. Engagements from $500.</p>
+          </div>
+          <div>
+            <div class="kind">Established regional companies</div>
+            <p class="lede">Agriculture, healthcare, hospitality, professional services with real customer volume. Full brand systems, custom software, client portals, and internal tools that replace stacks of $200 a month SaaS with something that fits the way you actually work. Engagements from $5,000.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="row">
+      <div class="label">Services</div>
+      <div>
+        <h2>What we make.</h2>
+        <ul class="services">
+          <li>
+            <div class="n">01</div>
+            <div class="t">Branding &amp; Visual Identity</div>
+            <div class="d">Logos, brand style guides, stationery systems, apparel programs. Built to hold up from a business card in Anacortes to a service van rolling through Burlington.</div>
+          </li>
+          <li>
+            <div class="n">02</div>
+            <div class="t">Websites &amp; Local SEO</div>
+            <div class="d">Mobile-first sites with Google Business Profile setup, local schema markup, and a review strategy built to actually rank for the queries that bring you work: plumber in Mount Vernon, brewery in La Conner, tulip tour in Skagit.</div>
+          </li>
+          <li>
+            <div class="n">03</div>
+            <div class="t">Signage &amp; Physical Applications</div>
+            <div class="d">Vehicle wraps, outdoor signage, wayfinding, and large format graphics. Ready for the Skagit County Fair, the Tulip Festival, or the side of your fleet.</div>
+          </li>
+          <li>
+            <div class="n">04</div>
+            <div class="t">Custom App Design &amp; Development</div>
+            <div class="d">Native iOS and Android apps, client portals, technician field apps, and business dashboards. When SaaS does not fit your operation and you are big enough to want your own tool.</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="approach">
+    <div class="row">
+      <div class="label">Approach</div>
+      <div>
+        <p class="lede">One person, one practice. The logo, the website, the signage, and the software come from the same hand, which is why everything looks like it belongs to the same company. Because it does.</p>
+        <p class="lede">AI carries the engineering weight that used to require a team. That is why one studio can deliver work that used to require an agency, at prices that make sense for a business in Sedro-Woolley or Mount Vernon.</p>
+        <p class="lede">Local means local. In-person meetings anywhere in the Skagit Valley, direct communication with the person actually doing the work, and turnaround times that match the way small businesses need to move.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="talk">
+    <div class="row">
+      <div class="label">Get started</div>
+      <div>
+        <h2>Free 30-minute consultation.</h2>
+        <p class="cta-lede">No pitch deck. No hard sell. Bring a problem, a project, or a rough idea. In-person anywhere in the Skagit Valley, or by video anywhere else. You leave with a clear next step, whether it is with us or not.</p>
+        <p class="cta-email"><a href="mailto:hello@mountainmediadigital.com?subject=Skagit%20Valley%20consultation&amp;body=Hi%20Keven%2C%0A%0AI%27d%20like%20to%20book%20a%20free%2030-minute%20consultation.%0A%0ABusiness%3A%20%0ACity%3A%20%0AWhat%20I%27m%20thinking%20about%3A%20%0A">hello@mountainmediadigital.com</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>&copy; 2026 Mountain Media Digital LLC<span style="color:var(--fg-mute);padding:0 6px;">/</span>La Conner, WA</div>
+    <div class="footer-links">
+      <a href="/">Studio home</a>
+      <a href="https://passchecker.app" target="_blank" rel="noopener">Pass Checker</a>
+      <a href="https://www.kevmo.me" target="_blank" rel="noopener">kevmo.me</a>
+      <a href="/privacy.html">Privacy</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// Subtle ambient effects: hairline draw-in, direction-aware micro shadow,
+// scroll-driven wordmark tracking. Same behaviour as the homepage.
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.top, .hero, section').forEach(el => io.observe(el));
+
+  if (reduce) return;
+
+  let pmx = 0, pmy = 0, vmx = 0, vmy = 0;
+  let lastT = performance.now();
+  window.addEventListener('mousemove', (e) => {
+    const now = performance.now();
+    const dt = Math.max(1, now - lastT);
+    vmx = (e.clientX - pmx) * 16 / dt;
+    vmy = (e.clientY - pmy) * 16 / dt;
+    pmx = e.clientX; pmy = e.clientY;
+    lastT = now;
+  }, { passive: true });
+
+  const wm = document.querySelector('.wordmark');
+  const LS_NEAR = -0.045;
+  const LS_FAR  = -0.058;
+
+  function paint() {
+    vmx *= 0.88;
+    vmy *= 0.88;
+    const sx = Math.max(-2.5, Math.min(2.5, -vmx * 0.18));
+    const sy = Math.max(-2.5, Math.min(2.5, -vmy * 0.18));
+    document.documentElement.style.setProperty('--ms-x', sx.toFixed(2) + 'px');
+    document.documentElement.style.setProperty('--ms-y', sy.toFixed(2) + 'px');
+
+    if (wm) {
+      const sy2 = window.scrollY;
+      const docH = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const p = Math.min(1, Math.max(0, sy2 / docH));
+      wm.style.letterSpacing = (LS_NEAR + (LS_FAR - LS_NEAR) * p).toFixed(4) + 'em';
+    }
+
+    requestAnimationFrame(paint);
+  }
+  requestAnimationFrame(paint);
+})();
+</script>
+
+<script>
+// Hero ASCII shader. Same as homepage, driven by /mountain.mp4.
+(() => {
+  const vid    = document.getElementById('hero-vid');
+  const out    = document.getElementById('hero-out');
+  const sample = document.getElementById('hero-sample');
+  if (!vid || !out || !sample) return;
+  const fig = out.parentElement;
+  const ctx = sample.getContext('2d', { willReadFrequently: true });
+
+  const FONT_SIZE = 9;
+  const ASPECT    = 0.50;
+  const RAMP      = " .,'~+=|#";
+  const N         = RAMP.length - 1;
+  const CONTRAST  = 1.30;
+  const GAMMA     = 1.00;
+  const BRIGHT    = 0.00;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) { vid.removeAttribute('autoplay'); vid.pause(); }
+  else { vid.play?.().catch(() => {}); }
+
+  let mxPage = -9999, myPage = -9999;
+  window.addEventListener('mousemove', e => {
+    mxPage = e.clientX; myPage = e.clientY;
+  }, { passive: true });
+  const BLOOM_R  = 75;
+  const BLOOM_R2 = BLOOM_R * BLOOM_R;
+  const BLOOM_K  = 0.40;
+
+  let lastW = 0, lastH = 0;
+  function tick() {
+    try {
+      const W = fig.clientWidth;
+      const H = fig.clientHeight;
+      const charW = Math.max(2, FONT_SIZE * ASPECT);
+      const cols = Math.max(20, Math.floor(W / charW));
+      const rows = Math.max(10, Math.floor(H / FONT_SIZE));
+      if (cols !== lastW || rows !== lastH) {
+        sample.width = cols; sample.height = rows;
+        lastW = cols; lastH = rows;
+      }
+      const figRect = fig.getBoundingClientRect();
+      const mInside =
+        mxPage >= figRect.left - BLOOM_R && mxPage <= figRect.right + BLOOM_R &&
+        myPage >= figRect.top  - BLOOM_R && myPage <= figRect.bottom + BLOOM_R;
+      const figMx = mxPage - figRect.left;
+      const figMy = myPage - figRect.top;
+
+      if (vid.readyState >= 2 && vid.videoWidth > 0) {
+        ctx.drawImage(vid, 0, 0, cols, rows);
+        const img = ctx.getImageData(0, 0, cols, rows).data;
+        const lines = new Array(rows);
+        for (let y = 0; y < rows; y++) {
+          let row = '';
+          const base = y * cols * 4;
+          const cellY = (y + 0.5) * FONT_SIZE;
+          const dy = mInside ? cellY - figMy : 9999;
+          for (let x = 0; x < cols; x++) {
+            const i = base + x * 4;
+            let lum = (0.299*img[i] + 0.587*img[i+1] + 0.114*img[i+2]) / 255;
+            lum = (lum - 0.5) * CONTRAST + 0.5 + BRIGHT;
+            if (lum < 0) lum = 0; else if (lum > 1) lum = 1;
+            lum = Math.pow(lum, GAMMA);
+            if (mInside) {
+              const cellX = (x + 0.5) * charW;
+              const dx = cellX - figMx;
+              const d2 = dx*dx + dy*dy;
+              if (d2 < BLOOM_R2) {
+                const k = 1 - Math.sqrt(d2) / BLOOM_R;
+                lum -= k * BLOOM_K;
+                if (lum < 0) lum = 0;
+              }
+            }
+            lum = 1 - lum;
+            let idx = (lum * N) | 0;
+            if (idx < 0) idx = 0; else if (idx > N) idx = N;
+            row += RAMP[idx];
+          }
+          lines[y] = row;
+        }
+        out.textContent = lines.join('\n');
+      }
+    } catch (_) { /* keep the loop alive */ }
+    if (!reduceMotion) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+
+<script type="module">
+// Breathing paragraphs via pretext, same as homepage.
+import { prepareWithSegments, layoutWithLines }
+  from 'https://esm.sh/@chenglou/pretext@latest';
+
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  await document.fonts.ready;
+  const targets = document.querySelectorAll('.lede, .services .d, .cta-lede');
+  for (const el of targets) {
+    try { setupBreathing(el); }
+    catch (e) { console.warn('[breathe] skipping', el, e); }
+  }
+}
+
+function setupBreathing(el) {
+  const text = el.textContent.replace(/\s+/g, ' ').trim();
+  if (!text) return;
+
+  const cs = getComputedStyle(el);
+  const fontSize   = parseFloat(cs.fontSize);
+  const fontWeight = cs.fontWeight;
+  const fontFamily = cs.fontFamily;
+  const color      = cs.color;
+  const lineHeight = parseFloat(cs.lineHeight) || fontSize * 1.55;
+  const font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+  const baseWidth = el.clientWidth;
+  if (baseWidth < 100) return;
+  const AMP    = 18;
+  let minWidth = Math.max(80, baseWidth - AMP);
+  let maxWidth = baseWidth;
+
+  const prepared = prepareWithSegments(text, font);
+
+  const hasWidow = (laid, w) => {
+    if (laid.lines.length < 2) return false;
+    return laid.lines[laid.lines.length - 1].width < w * 0.18;
+  };
+  for (let i = 0; i < 5 && maxWidth - minWidth >= 12; i++) {
+    const hi = layoutWithLines(prepared, maxWidth, lineHeight);
+    if (hasWidow(hi, maxWidth)) { maxWidth -= 8; continue; }
+    const lo = layoutWithLines(prepared, minWidth, lineHeight);
+    if (hasWidow(lo, minWidth)) { minWidth += 8; continue; }
+    break;
+  }
+
+  const tall = layoutWithLines(prepared, minWidth, lineHeight);
+  el.style.minHeight = tall.height + 'px';
+  el.style.position  = 'relative';
+  el.style.color = 'transparent';
+
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'absolute';
+  canvas.style.left = '0';
+  canvas.style.top  = '0';
+  canvas.style.pointerEvents = 'none';
+  canvas.setAttribute('aria-hidden', 'true');
+  el.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  const PERIOD = 7200 + Math.random() * 1600;
+  const phase  = Math.random() * Math.PI * 2;
+  const start  = performance.now();
+  let loggedErr = false;
+  let alive = true;
+
+  function render() {
+    if (!alive) return;
+    try {
+      const now = performance.now();
+      const t   = (now - start) / PERIOD * Math.PI * 2 + phase;
+      const w   = minWidth + (maxWidth - minWidth) * (0.5 + 0.5 * Math.sin(t));
+
+      const laid = layoutWithLines(prepared, w, lineHeight);
+      const dpr  = devicePixelRatio || 1;
+      const cw   = Math.ceil(maxWidth * dpr);
+      const ch   = Math.ceil(tall.height * dpr);
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width  = cw;
+        canvas.height = ch;
+        canvas.style.width  = maxWidth + 'px';
+        canvas.style.height = tall.height + 'px';
+      }
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, maxWidth, tall.height);
+      ctx.font = font;
+      ctx.fillStyle = color;
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i < laid.lines.length; i++) {
+        ctx.fillText(laid.lines[i].text, 0, (i + 0.5) * lineHeight);
+      }
+    } catch (e) {
+      if (!loggedErr) {
+        loggedErr = true;
+        console.warn('[breathe] render failed, falling back to DOM text:', e);
+      }
+      alive = false;
+      canvas.remove();
+      el.style.color = '';
+      el.style.minHeight = '';
+      return;
+    }
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  const ro = new ResizeObserver(() => {
+    const w = el.clientWidth;
+    if (Math.abs(w - baseWidth) < 4) return;
+    canvas.remove();
+    el.style.color = '';
+    el.style.minHeight = '';
+    setupBreathing(el);
+    ro.disconnect();
+  });
+  ro.observe(el);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mountainmediadigital.com/sitemap.xml
