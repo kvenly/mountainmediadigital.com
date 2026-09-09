@@ -306,7 +306,7 @@
 
   /* DIRECTION-AWARE MICRO SHADOW */
   :root { --ms-x: 0px; --ms-y: 0px; }
-  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.18); }
+  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.32); }
   .lede, .services .d, .cta-lede, .ascii { text-shadow: none; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -447,26 +447,37 @@
 
   if (reduce) return;
 
-  let pmx = 0, pmy = 0, vmx = 0, vmy = 0;
-  let lastT = performance.now();
-  window.addEventListener('mousemove', (e) => {
-    const now = performance.now();
-    const dt = Math.max(1, now - lastT);
-    vmx = (e.clientX - pmx) * 16 / dt;
-    vmy = (e.clientY - pmy) * 16 / dt;
-    pmx = e.clientX; pmy = e.clientY;
-    lastT = now;
-  }, { passive: true });
+  let vmx = 0, vmy = 0;
+  const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (hasFinePointer) {
+    let pmx = 0, pmy = 0, lastT = performance.now();
+    window.addEventListener('mousemove', (e) => {
+      const now = performance.now();
+      const dt = Math.max(1, now - lastT);
+      vmx = (e.clientX - pmx) * 16 / dt;
+      vmy = (e.clientY - pmy) * 16 / dt;
+      pmx = e.clientX; pmy = e.clientY;
+      lastT = now;
+    }, { passive: true });
+  } else {
+    let lastSY = window.scrollY;
+    window.addEventListener('scroll', () => {
+      const sy = window.scrollY;
+      vmy += (sy - lastSY) * 0.55;
+      lastSY = sy;
+    }, { passive: true });
+  }
 
   const wm = document.querySelector('.wordmark');
   const LS_NEAR = -0.045;
   const LS_FAR  = -0.058;
 
   function paint() {
-    vmx *= 0.88;
-    vmy *= 0.88;
-    const sx = Math.max(-2.5, Math.min(2.5, -vmx * 0.18));
-    const sy = Math.max(-2.5, Math.min(2.5, -vmy * 0.18));
+    vmx *= 0.90;
+    vmy *= 0.90;
+    const sx = Math.max(-5, Math.min(5, -vmx * 0.28));
+    const sy = Math.max(-5, Math.min(5, -vmy * 0.28));
     document.documentElement.style.setProperty('--ms-x', sx.toFixed(2) + 'px');
     document.documentElement.style.setProperty('--ms-y', sy.toFixed(2) + 'px');
 

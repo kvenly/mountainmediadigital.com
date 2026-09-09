@@ -310,7 +310,7 @@
 
   /* ─── DIRECTION-AWARE MICRO SHADOW ─────────────────────── */
   :root { --ms-x: 0px; --ms-y: 0px; }
-  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.18); }
+  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.32); }
   /* Canvas-rendered paragraphs have transparent DOM text; suppress shadow
      so the invisible glyphs don't leak as shadows. */
   .lede, .services .d, .project-desc, .ascii { text-shadow: none; }
@@ -483,16 +483,33 @@
   if (reduce) return;
 
   // ─── 2. Direction-aware micro shadow ─────────────────────
-  let pmx = 0, pmy = 0, vmx = 0, vmy = 0;
-  let lastT = performance.now();
-  window.addEventListener('mousemove', (e) => {
-    const now = performance.now();
-    const dt = Math.max(1, now - lastT);
-    vmx = (e.clientX - pmx) * 16 / dt;
-    vmy = (e.clientY - pmy) * 16 / dt;
-    pmx = e.clientX; pmy = e.clientY;
-    lastT = now;
-  }, { passive: true });
+  // On devices with a fine pointer, mouse velocity drives it. On touch
+  // devices (phones, tablets), scroll velocity drives it instead so the
+  // effect reads on every device.
+  let vmx = 0, vmy = 0;
+  const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (hasFinePointer) {
+    let pmx = 0, pmy = 0, lastT = performance.now();
+    window.addEventListener('mousemove', (e) => {
+      const now = performance.now();
+      const dt = Math.max(1, now - lastT);
+      vmx = (e.clientX - pmx) * 16 / dt;
+      vmy = (e.clientY - pmy) * 16 / dt;
+      pmx = e.clientX; pmy = e.clientY;
+      lastT = now;
+    }, { passive: true });
+  } else {
+    let lastSY = window.scrollY;
+    window.addEventListener('scroll', () => {
+      const sy = window.scrollY;
+      // Scroll deltas can be big; feed into vmy at a gentler scale.
+      // Positive scroll (moving down the page) reads like the content is
+      // rising, so shadow lands below (matches desktop feel).
+      vmy += (sy - lastSY) * 0.55;
+      lastSY = sy;
+    }, { passive: true });
+  }
 
   // ─── 3. Wordmark scroll tracking ─────────────────────────
   const wm = document.querySelector('.wordmark');
@@ -501,10 +518,10 @@
 
   function paint() {
     // Shadow: decay velocity, write CSS vars (opposite of motion)
-    vmx *= 0.88;
-    vmy *= 0.88;
-    const sx = Math.max(-2.5, Math.min(2.5, -vmx * 0.18));
-    const sy = Math.max(-2.5, Math.min(2.5, -vmy * 0.18));
+    vmx *= 0.90;
+    vmy *= 0.90;
+    const sx = Math.max(-5, Math.min(5, -vmx * 0.28));
+    const sy = Math.max(-5, Math.min(5, -vmy * 0.28));
     document.documentElement.style.setProperty('--ms-x', sx.toFixed(2) + 'px');
     document.documentElement.style.setProperty('--ms-y', sy.toFixed(2) + 'px');
 
