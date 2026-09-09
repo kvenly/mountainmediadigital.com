@@ -304,16 +304,16 @@
   }
   .in-view::after { transform: scaleX(1); }
 
-  /* DIRECTION-AWARE MICRO SHADOW */
-  :root { --ms-x: 0px; --ms-y: 0px; }
-  body { text-shadow: var(--ms-x) var(--ms-y) 0 rgba(0,0,0,0.32); }
+  /* DIRECTION-AWARE MICRO SHADOW (fading tail) */
+  :root { --ms-shadow: 0 0 0 transparent; }
+  body { text-shadow: var(--ms-shadow); }
   .lede, .services .d, .cta-lede, .ascii { text-shadow: none; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { transition: none !important; animation: none !important; }
     .top::after, .hero::after, section::after { transform: scaleX(1); }
-    body { text-shadow: none; }
+    body { text-shadow: none !important; }
   }
 </style>
 </head>
@@ -473,13 +473,30 @@
   const LS_NEAR = -0.045;
   const LS_FAR  = -0.058;
 
+  const TAIL = 7;
+  const hist = Array.from({ length: TAIL }, () => ({ x: 0, y: 0 }));
+
   function paint() {
-    vmx *= 0.90;
-    vmy *= 0.90;
-    const sx = Math.max(-5, Math.min(5, -vmx * 0.28));
-    const sy = Math.max(-5, Math.min(5, -vmy * 0.28));
-    document.documentElement.style.setProperty('--ms-x', sx.toFixed(2) + 'px');
-    document.documentElement.style.setProperty('--ms-y', sy.toFixed(2) + 'px');
+    vmx *= 0.92;
+    vmy *= 0.92;
+    const sx = Math.max(-6, Math.min(6, -vmx * 0.30));
+    const sy = Math.max(-6, Math.min(6, -vmy * 0.30));
+
+    for (let i = hist.length - 1; i > 0; i--) {
+      hist[i].x = hist[i - 1].x;
+      hist[i].y = hist[i - 1].y;
+    }
+    hist[0].x = sx;
+    hist[0].y = sy;
+
+    let shadow = '';
+    for (let i = 0; i < hist.length; i++) {
+      const a = 0.30 * Math.pow(0.72, i);
+      if (a < 0.01) break;
+      if (i > 0) shadow += ',';
+      shadow += `${hist[i].x.toFixed(2)}px ${hist[i].y.toFixed(2)}px 0 rgba(0,0,0,${a.toFixed(3)})`;
+    }
+    document.documentElement.style.setProperty('--ms-shadow', shadow || '0 0 0 transparent');
 
     if (wm) {
       const sy2 = window.scrollY;
