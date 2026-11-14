@@ -72,6 +72,7 @@
     overflow-x: hidden;
   }
   img, video, svg { display: block; max-width: 100%; }
+  main { overflow-x: clip; } /* rotated prints and the sweep never cause sideways scroll */
   a { color: inherit; }
   ::selection { background: var(--green); color: var(--cream); }
   :focus-visible { outline: 3px solid var(--green); outline-offset: 3px; border-radius: 4px; }
@@ -321,8 +322,13 @@
   .plan li::before { content: ''; position: absolute; left: 2px; top: .5em; width: 12px; height: 12px; border-radius: 50%; background: var(--pink); box-shadow: inset 0 0 0 2px var(--deep); }
   .plan li.no { color: var(--dim); }
   .plan li.no::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--dim); }
-  .plan .or { margin-top: 20px; padding-top: 18px; border-top: 1px dashed rgba(39,107,80,.35); font-size: 16px; }
-  .plan .or strong { color: var(--green); }
+  .plan .sum { font-size: 16px; font-weight: 600; color: var(--green); }
+  .plan .alc { margin-top: 24px; padding-top: 20px; border-top: 1px dashed rgba(39,107,80,.35); }
+  .plan .alc-h { font-size: 16px; }
+  .plan .alc-h strong { color: var(--green); }
+  .plan ul.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .plan .chips li { padding: 6px 14px 6px 28px; border-radius: 999px; background: var(--cream); font-size: 15px; font-weight: 500; color: var(--ink); }
+  .plan .chips li::before { left: 11px; top: 50%; margin-top: -5px; width: 10px; height: 10px; }
   .plan.full { box-shadow: inset 0 0 0 2px var(--green), 0 22px 40px -22px rgba(24,36,28,.5); }
   .plan.full .pflag { position: absolute; right: 26px; top: -44px; width: 26px; transform: rotate(8deg); }
   .invite { margin-top: 28px; display: flex; gap: 16px; align-items: flex-start; background: rgba(242,169,196,.28); padding: 20px 22px; border-radius: 14px; }
@@ -408,7 +414,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .flag .cloth, .sw svg .cloth { animation: none; }
-    .js .rv, .js .dp, .js .pk, .js .fl { opacity: 1; transform: none; translate: none; scale: none; rotate: none; animation: none; transition: none; }
+    .js .rv, .js .dp, .js .pk, .js .fl,
+    .js .rv.in, .js .dp.in, .js .pk.in, .js .fl.in { opacity: 1; transform: none; translate: none; scale: none; rotate: none; animation: none; transition: none; }
     .js .sweep.armed::before { clip-path: none; }
     .js .sweep.armed > .sw { display: none; }
     .js .sweep.armed .wrap { opacity: 1; }
@@ -439,7 +446,7 @@
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD",
-    "description": "Free to download with The Gyre included. Unlock the full game for $10, or courses for $1.99 each."
+    "description": "Free to download with The Gyre included. Unlock the full game for $10 (one-time purchase), or a course, the wardrobe, or Skins games for $1.99 each."
   },
   "publisher": {
     "@type": "Organization",
@@ -620,7 +627,7 @@
   <div class="wrap">
     <div class="label rv">Pricing</div>
     <h2 id="price-h" class="rv" style="--d:.12s">Free to start. Simple to unlock.</h2>
-    <p class="lede rv" style="--d:.24s">Free to download. The Gyre is free. Any course is free to play when a friend who owns it starts the round. Unlock everything for $10, or $1.99 a course.</p>
+    <p class="lede rv" style="--d:.24s">Free to download. The Gyre is free. Any course is free to play when a friend who owns it starts the round. Unlock everything for $10, one&#8209;time, or pick what you want for $1.99 each.</p>
     <div class="plans">
       <div class="plan rv">
         <h3>Free</h3>
@@ -634,13 +641,21 @@
       <div class="plan full rv" style="--d:.1s">
         <span class="pflag fl" style="--d:.4s"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg></span>
         <h3>Full game</h3>
-        <div class="price">$10</div>
+        <div class="price">$10<small>one-time</small></div>
+        <p class="sum">Everything, unlocked.</p>
         <ul>
           <li>All nine courses</li>
           <li>Skins games</li>
-          <li>The wardrobe and the color palette, unlocked</li>
+          <li>The wardrobe and the color palette</li>
         </ul>
-        <p class="or">Just want one course? <strong>$1.99 each.</strong></p>
+        <div class="alc">
+          <p class="alc-h">Or à la carte, <strong>$1.99 each</strong></p>
+          <ul class="chips" aria-label="À la carte unlocks, $1.99 each">
+            <li>Any course</li>
+            <li>The wardrobe</li>
+            <li>Skins games</li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="invite rv"><div class="num" aria-hidden="true">+</div><p><strong>Invites are free.</strong> If a friend owns a course and starts the round, you can play it with them without buying anything.</p></div>
@@ -750,14 +765,20 @@
   if (!('IntersectionObserver' in window) || quiet.matches) {
     showAll();
   } else {
+    // A flag starts its hop off to the side (possibly off-screen), so it
+    // is watched through its parent rather than its own box.
+    var watch = new Map();
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        if (!e.isIntersecting) { return; }
+        (watch.get(e.target) || []).forEach(function (el) { el.classList.add('in'); });
+        io.unobserve(e.target);
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
     items.forEach(function (el) {
-      // Anything already above the fold just plays its entrance.
-      io.observe(el);
+      var t = el.classList.contains('fl') ? el.parentElement : el;
+      if (!watch.has(t)) { watch.set(t, []); io.observe(t); }
+      watch.get(t).push(el);
     });
 
     // The big flag sweep: one eased progress value drives both the pole
