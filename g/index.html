@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>G · Golf duels in iMessage</title>
 <meta name="description" content="G is asynchronous golf for iMessage. Play your hole, send it, and your friend plays the same one. Nine courses, three formats, no schedules.">
 
@@ -28,344 +25,395 @@
 <link rel="icon" href="/g/favicon-32.png" sizes="32x32">
 <link rel="icon" href="/g/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="/g/apple-touch-icon.png">
-<meta name="theme-color" content="#0f6b4f">
+<meta name="theme-color" content="#F6EFD8">
 
+<!-- Motion is opt-in: content is only hidden for a scroll-in when script runs. -->
+<script>document.documentElement.classList.add('js');</script>
 
 <style>
-  :root {
-    --bg:      #fafafa;
-    --fg:      #000000;
-    --fg-dim:  #6a6a6a;
-    --fg-mute: #a8a8a8;
-    --rule:    #e5e5e5;
-
-    /* G's own colors: cream, clubhouse green, pennant pink. */
-    --cream:   #f6efd8;
-    --green:   #0f6b4f;
-    --green-d: #0b4f3b;
-    --pink:    #f2a9c4;
-
-    /* Playfair and Inconsolata are the site's own voices. The sans rides
-       the system stack: the game's SF Pro on Apple, and Inter was an SF
-       lookalike anyway, so this matches without downloading a thing. */
-    --sans:    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    --serif:   'Playfair Display', Georgia, 'Times New Roman', serif;
+  /* Newsreader is the web stand-in for New York. Apple devices resolve
+     ui-serif first and never fetch it. */
+  @font-face {
+    font-family: 'Newsreader';
+    src: url('fonts/newsreader-600-800.woff2') format('woff2');
+    font-weight: 600 800; font-style: normal; font-display: swap;
   }
+  :root {
+    --cream:  #F6EFD8;
+    --paper:  #FFFDF6;
+    --green:  #276B50;
+    --deep:   #0B4F3B;
+    --pink:   #F2A9C4;
+    --ink:    #2B3A31;   /* body text on cream, 10.4:1 */
+    --dim:    #4A5A50;   /* secondary text on cream, 6.4:1 */
+    --mist:   #DCE6DE;   /* secondary text on green, 5.0:1 */
+    --serif:  ui-serif, 'New York', 'Newsreader', Georgia, 'Times New Roman', serif;
+    --sans:   system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* MOTION.md tokens */
+    --out:    cubic-bezier(.22, 1, .36, 1);
+    --settle: cubic-bezier(.34, 1.56, .64, 1);
+    --inout:  cubic-bezier(.65, 0, .35, 1);
+    --punch:  cubic-bezier(.18, 1.9, .4, 1);
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .28 0 0 0 0 .18 0 0 0 .16 -.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --wrap: 1160px;
+    --gut: 20px;
+  }
+  @media (min-width: 700px) { :root { --gut: 40px; } }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
-    background: var(--bg);
-    color: var(--fg);
+    background: var(--grain), var(--cream);
+    color: var(--ink);
     font-family: var(--sans);
-    line-height: 1.4;
+    font-size: 17px; line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
-  a { color: var(--fg); text-decoration: none; }
-  a:hover { color: var(--fg-dim); }
+  img, video, svg { display: block; max-width: 100%; }
+  a { color: inherit; }
   ::selection { background: var(--green); color: var(--cream); }
-  img, video { max-width: 100%; display: block; }
+  :focus-visible { outline: 3px solid var(--green); outline-offset: 3px; border-radius: 4px; }
+  .green :focus-visible { outline-color: var(--pink); }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--green); color: var(--cream); padding: 10px 16px; border-radius: 999px; z-index: 50; }
+  .skip:focus { left: 12px; }
 
-  .page { padding: 32px 40px; }
-  @media (max-width: 600px) { .page { padding: 20px; } }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gut); }
+  .sec { padding: 96px 0; position: relative; }
+  @media (min-width: 900px) { .sec { padding: 144px 0; } }
+  .sec.tight { padding-top: 24px; }
+  @media (min-width: 900px) { .sec.tight { padding-top: 80px; } }
 
-  /* TOP STRIP: matches the studio site */
-  .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--rule);
-    font-size: 14px;
-    color: var(--fg-dim);
+  /* TYPE */
+  .serif, h1, h2, h3 { font-family: var(--serif); font-weight: 800; letter-spacing: -0.02em; line-height: 1; color: var(--green); }
+  h1 { font-size: clamp(42px, 11vw, 80px); }
+  h1 .ln { display: block; }
+  h2 { font-size: clamp(36px, 8.6vw, 64px); text-wrap: balance; max-width: 16ch; }
+  h3 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.12; }
+  .label {
+    font-family: var(--sans); font-weight: 600; font-size: 13px; line-height: 1.2;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--green);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
   }
-  .top .meta span { color: var(--fg-mute); padding: 0 4px; }
-  .top nav { display: flex; gap: 28px; }
-  .top nav a { color: var(--fg); }
-  @media (max-width: 600px) {
-    .top { flex-direction: column; gap: 12px; align-items: flex-start; font-size: 13px; }
-    .top nav { gap: 18px; }
-  }
+  .lede { font-size: 18px; line-height: 1.55; color: var(--dim); max-width: 34em; margin-top: 22px; text-wrap: pretty; }
+  @media (min-width: 900px) { .lede { font-size: 20px; } }
+  @media (min-width: 900px) and (max-width: 1099px) { h1 { font-size: 6.4vw; } }
+  .green { background: var(--grain), var(--green); color: var(--cream); }
+  .green h2, .green h3, .green .label { color: var(--cream); }
+  .green .lede { color: var(--mist); }
 
-  /* HERO: the course itself, with the type standing in its sky. */
-  .hero {
-    position: relative; isolation: isolate;
-    margin: 0 -40px; padding: 96px 40px 104px;
-    border-bottom: 1px solid var(--rule);
-    background-color: var(--green);   /* only shows if the art fails */
-    background-position: center 45%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    /* Flat-shaded art compresses hard: the WebP is a quarter of the
-       JPEG's weight. The plain url() stays first as the fallback for
-       anything that cannot parse image-set; only the winning
-       declaration is ever fetched. */
-    background-image: url('hero-lakepines.jpg');
-    background-image: image-set(url('hero-sm.webp') type('image/webp'),
-                                url('hero-sm.jpg') type('image/jpeg'));
-    color: #fff;
+  /* THE FLAG: freed from the mark. Cloth flutters at 1.5 Hz. */
+  .flag { overflow: visible; }
+  .flag .pole { fill: var(--green); }
+  .green .flag .pole { fill: var(--paper); }
+  .flag .cloth { fill: var(--pink); transform-box: fill-box; transform-origin: 0% 50%; animation: flutter .667s ease-in-out infinite; }
+  @keyframes flutter {
+    0%, 100% { transform: skewY(0deg) scaleX(1); }
+    30%      { transform: skewY(-5deg) scaleX(.93); }
+    65%      { transform: skewY(3deg) scaleX(.98); }
   }
-  @media (min-width: 701px) {
-    .hero {
-      background-image: url('hero-lakepines.jpg');
-      background-image: image-set(url('hero-lakepines.webp') type('image/webp'),
-                                  url('hero-lakepines.jpg') type('image/jpeg'));
-    }
+  .label .flag { width: 9px; height: 22px; flex: none; }
+
+  /* PAPER: prints, tape, stamps */
+  .print {
+    position: relative; background: var(--paper);
+    padding: 4% 4% 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 22px 40px -18px rgba(24,36,28,.5), 0 6px 12px -6px rgba(24,36,28,.25);
   }
-  @media (max-width: 600px) { .hero { margin: 0 -20px; padding: 64px 20px 76px; } }
-  .hero::after {
-    content: ''; position: absolute; inset: 0; z-index: -1;
-    /* The scrim is the page's own colour decision, so it is clubhouse
-       green rather than the navy it used to be. It carries the dusk sky
-       toward the brand and hands off to the green film band below. */
-    background: linear-gradient(180deg,
-      rgba(5,41,30,.72) 0%, rgba(6,51,37,.42) 48%, rgba(6,51,37,.30) 100%);
+  .print picture, .print video, .print > img { display: block; width: 100%; background: #cfd8cc; }
+  .print img, .print video { width: 100%; height: 100%; object-fit: cover; }
+  .print .ph { aspect-ratio: 4 / 5; overflow: hidden; background: #cfd8cc; }
+  .print figcaption, .print .cap { padding: 10px 2px 14px; font-size: 13px; line-height: 1.35; color: var(--dim); }
+  .print .cap b, .print figcaption b { display: block; font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; line-height: 1.1; margin-bottom: 2px; }
+  .print.bare { padding-bottom: 14%; }
+  .tape {
+    position: absolute; z-index: 3; left: 50%; top: -11px; width: 36%; height: 24px; margin-left: -18%;
+    background: linear-gradient(180deg, rgba(252,249,238,.9), rgba(236,229,206,.86));
+    box-shadow: 0 1px 2px rgba(0,0,0,.10);
+    clip-path: polygon(0 0,100% 0,97% 18%,100% 36%,97% 54%,100% 72%,97% 88%,100% 100%,0 100%,3% 84%,0 66%,3% 48%,0 30%,3% 14%);
+    transform: rotate(var(--tr, -3deg));
   }
-  .mark { width: 84px; margin-bottom: 26px; filter: brightness(0) invert(1); }
-  .hero h1 {
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: clamp(40px, 6.6vw, 80px);
-    line-height: 1.0;
-    letter-spacing: -0.02em;
-    max-width: 16ch;
-    /* Let the browser even out the lines instead of stranding a word. */
-    text-wrap: balance;
-    text-shadow: 0 2px 30px rgba(0,0,0,.42);
-  }
-  .hero .sub {
-    margin-top: 22px;
-    font-size: clamp(17px, 2.1vw, 21px);
-    line-height: 1.5;
-    color: rgba(255,255,255,.9);
-    /* The h1 carries a shadow; this sits lower, over pale fairway, and
-       needs one more than the headline does. */
-    text-shadow: 0 1px 18px rgba(4,26,18,.55);
-    max-width: 40ch;
-    font-weight: 300;
-    text-wrap: pretty;
-    text-shadow: 0 1px 20px rgba(0,0,0,.45);
-  }
-  .hero .cta { background: var(--cream); color: var(--green); }
-  .hero .cta:hover { background: #fff; color: var(--green-d); }
-  .hero .cta-note { color: rgba(255,255,255,.74); }
-  .badges { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-  /* Two buttons now, so the note takes its own line rather than
-     crowding in beside them. */
-  .badges .cta-note { flex-basis: 100%; margin-top: 2px; }
-  .cta {
-    display: inline-flex; align-items: center; gap: 9px;
-    background: var(--green); color: var(--cream);
-    padding: 14px 26px; border-radius: 999px;
-    font-size: 15px; font-weight: 600;
-  }
-  .cta:hover { background: var(--green-d); color: var(--cream); }
-  .cta-note { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); }
-  /* Secondary action. The App Store link leads now that G is out, so
-     this one steps back to an outline. */
-  .cta.quiet { background: transparent; color: var(--green); box-shadow: inset 0 0 0 1px currentColor; }
-  .cta.quiet:hover { background: var(--green); color: var(--cream); box-shadow: none; }
-  /* The close section defines its own .cta later in the file, so this
-     pair must restate the background or it inherits a cream fill and
-     the cream label disappears into it. */
-  .hero .cta.quiet, .close .cta.quiet {
-    background: transparent; color: var(--cream);
-    box-shadow: inset 0 0 0 1px var(--cream);
-  }
-  .hero .cta.quiet:hover, .close .cta.quiet:hover {
-    background: var(--cream); color: var(--green); box-shadow: none;
+  .stamp {
+    display: inline-grid; place-items: center; text-align: center;
+    width: 86px; height: 86px; border-radius: 50%;
+    background: var(--pink); color: var(--deep);
+    font-family: var(--sans); font-weight: 700; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; line-height: 1.15;
+    box-shadow: 0 0 0 3px var(--pink), 0 0 0 4.5px var(--deep), 0 10px 18px -8px rgba(24,36,28,.45);
+    transform: rotate(-12deg);
   }
 
-  /* FILM STRIP: phone-shaped media, shown at phone scale.
-     A full-bleed band in the game's own night sky, so the two handsets
-     read as a screening rather than two pictures on a page. */
-  .film {
-    margin: 0 -40px; padding: 86px 40px 96px;
-    /* Clubhouse green, lifted at the top and deepened at the floor. The
-       band was the game's sky blue, which is not a brand colour. */
-    background:
-      radial-gradient(96% 68% at 50% 46%, #16805f 0%, var(--green) 42%, #05291e 100%);
-    color: #fff;
+  /* BUTTONS */
+  .badge { display: inline-block; line-height: 0; border-radius: 10px; }
+  .badge img { height: 54px; width: auto; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    background: var(--green); color: var(--cream); text-decoration: none;
+    padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; border: 0; cursor: pointer; font-family: var(--sans);
   }
-  @media (max-width: 600px) { .film { margin: 0 -20px; padding: 58px 20px 64px; } }
-  .film .eyebrow { color: var(--pink); text-align: center; }
-  .film h2 {
-    font-family: var(--serif); font-weight: 700;
-    font-size: clamp(28px, 4.2vw, 46px); line-height: 1.1;
-    letter-spacing: -0.015em; color: var(--cream);
-    text-align: center; margin: 0 auto 52px; max-width: 20ch;
-    text-wrap: balance;
-  }
-  @media (max-width: 600px) { .film h2 { margin-bottom: 34px; } }
-  .film-grid {
-    display: flex; flex-wrap: wrap; gap: 40px 56px;
-    justify-content: center; align-items: flex-start;
-  }
-  /* Only the film pair gets the wider gutter; the thread runs three
-     across and needs every pixel to stay on one line. */
-  .film .film-grid { gap: 40px 64px; }
-  /* The thread grid runs three across and must still fit; only the film
-     pair gets the larger handset. */
-  .plate { width: 274px; max-width: 78vw; }
-  .film .plate { width: 320px; }
-  /* Drop the second handset so the pair reads as a still from a reel,
-     not a matched pair of thumbnails. */
-  .film .plate:nth-child(2) { margin-top: 56px; }
-  @media (max-width: 820px) { .film .plate:nth-child(2) { margin-top: 0; } }
-  .screen {
-    background: var(--cream);
-    border-radius: 34px;
-    padding: 9px;
-    box-shadow: 0 40px 90px -30px rgba(0,0,0,.75),
-                0 0 0 1px rgba(255,255,255,.10);
-  }
-  .screen video, .screen img { border-radius: 26px; width: 100%; }
-  .cap {
-    font-family: var(--mono); font-size: 12.5px; color: var(--fg-mute);
-    margin-top: 14px; letter-spacing: 0.01em; line-height: 1.45;
-  }
-  .film .cap { color: rgba(246,239,216,.66); text-align: center; }
+  .pill:hover { background: var(--deep); }
+  .pill.ghost { background: transparent; color: var(--cream); box-shadow: inset 0 0 0 1.5px var(--cream); }
+  .pill.ghost:hover { background: var(--cream); color: var(--green); }
+  .note { font-size: 14px; color: var(--dim); }
+  .green .note { color: var(--mist); }
 
-  /* SECTIONS */
-  .sec { padding: 72px 0; border-bottom: 1px solid var(--rule); }
-  .sec h2 {
-    font-family: var(--serif); font-weight: 600;
-    font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.01em;
-    margin-bottom: 10px;
-  }
-  .sec .lede {
-    font-size: 17px; color: var(--fg-dim); max-width: 62ch;
-    font-weight: 300; line-height: 1.55; margin-bottom: 44px;
-  }
-  .eyebrow {
-    font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--fg-mute); margin-bottom: 16px;
+  /* TOP */
+  .top { position: relative; z-index: 5; }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .top .home { display: flex; align-items: center; gap: 12px; text-decoration: none; font-size: 14px; color: var(--dim); }
+  .top .home img { width: 46px; height: auto; }
+  .top nav { display: flex; align-items: center; gap: 26px; font-size: 15px; }
+  .top nav a { text-decoration: none; color: var(--ink); }
+  .top nav a:hover { color: var(--green); text-decoration: underline; text-underline-offset: 4px; }
+  .top nav .pill { color: var(--cream); padding: 10px 18px; min-height: 40px; font-size: 14px; }
+  .top nav .pill:hover { text-decoration: none; color: var(--cream); }
+  .top .by { display: none; }
+  @media (min-width: 900px) { .top .by { display: inline; } }
+  @media (max-width: 819px) { .top nav .opt { display: none; } }
+
+  /* HERO */
+  .hero { padding: 28px 0 72px; }
+  .hero .wrap { display: grid; gap: 40px; }
+  .hero .sub { font-size: 19px; line-height: 1.5; color: var(--ink); max-width: 30em; margin-top: 22px; text-wrap: pretty; }
+  .hero .act { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 30px; }
+  .collage { position: relative; width: 100%; max-width: 520px; margin: 0 auto; aspect-ratio: 1 / 1.02; }
+  .collage .print { position: absolute; }
+  .collage .c1 { width: 44%; left: 0;  top: 12%; transform: rotate(-8deg); z-index: 1; }
+  .collage .c2 { width: 44%; right: 0; top: 7%;  transform: rotate(7deg); z-index: 1; }
+  .collage .c3 { width: 56%; left: 22%; top: 20%; transform: rotate(-1.5deg); z-index: 2; }
+  .collage .hflag { position: absolute; z-index: 4; width: 9%; left: 62%; top: 1.5%; transform: rotate(-8deg); transform-origin: 50% 100%; }
+  .collage .hflag svg { width: 100%; height: auto; }
+  @media (min-width: 900px) {
+    .hero { padding: 56px 0 104px; }
+    .hero .wrap { grid-template-columns: 1.15fr 1fr; align-items: center; gap: 48px; min-height: min(calc(100vh - 230px), 640px); }
+    .hero h1 .ln { white-space: nowrap; }
+    .collage { max-width: 560px; }
+    .hero .sub { font-size: 21px; }
   }
 
-  /* THREE STEPS */
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
-  @media (max-width: 820px) { .steps { grid-template-columns: 1fr; gap: 28px; } }
-  .step .n {
-    font-family: var(--serif); font-size: 40px; color: var(--pink);
-    line-height: 1; margin-bottom: 12px;
+  /* FEEL (gameplay clips) */
+  .feel .wrap { display: grid; gap: 48px; }
+  .reel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 640px; margin: 0 auto; width: 100%; }
+  .reel .print { padding: 5% 5% 0; }
+  .reel .print:nth-child(1) { transform: rotate(-2.2deg); }
+  .reel .print:nth-child(2) { transform: rotate(2deg); margin-top: 36px; }
+  .reel .ph { aspect-ratio: 540 / 1048; }
+  .reel video { cursor: pointer; }
+  .reel .cap { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .pp {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer;
+    background: var(--green); color: var(--cream); display: grid; place-items: center; margin-top: -2px;
   }
-  .step h3 { font-size: 17px; font-weight: 600; margin-bottom: 7px; }
-  .step p { font-size: 15px; color: var(--fg-dim); font-weight: 300; line-height: 1.55; }
+  .pp svg { width: 12px; height: 12px; fill: currentColor; }
+  .pp .i-play { display: none; }
+  .pp[aria-pressed="false"] .i-play { display: block; }
+  .pp[aria-pressed="false"] .i-pause { display: none; }
+  @media (min-width: 900px) {
+    .feel .wrap { grid-template-columns: 1fr 1.1fr; align-items: center; gap: 72px; }
+    .reel { gap: 36px; }
+    .reel .print:nth-child(2) { margin-top: 72px; }
+  }
+
+  /* HOW */
+  .steps { list-style: none; display: grid; gap: 36px; margin-top: 56px; counter-reset: s; }
+  .step { display: grid; grid-template-columns: 38% 1fr; gap: 22px; align-items: center; }
+  .step .print { padding: 5% 5% 0; }
+  .step .print .ph { aspect-ratio: 900 / 1700; }
+  .step .print img { object-position: 50% 0; }
+  .step:nth-child(1) .print { transform: rotate(-2deg); }
+  .step:nth-child(2) .print { transform: rotate(1.6deg); }
+  .step:nth-child(3) .print { transform: rotate(-1deg); }
+  .num {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--pink); color: var(--deep);
+    display: grid; place-items: center; font-weight: 700; font-size: 17px; margin-bottom: 14px;
+  }
+  .step p { margin-top: 8px; color: var(--dim); font-size: 16px; }
+  @media (min-width: 900px) {
+    .steps { grid-template-columns: repeat(3, 1fr); gap: 48px; margin-top: 72px; }
+    .step { grid-template-columns: 1fr; gap: 28px; align-items: start; }
+    .step .print { width: 74%; }
+    .step:nth-child(2) { margin-top: 48px; }
+    .step p { font-size: 17px; }
+  }
+
+  /* SWEEP: the big pink flag wipes cream to green */
+  .sweep { position: relative; isolation: isolate; overflow: hidden; }
+  .sweep::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--grain), var(--green); }
+  .sweep > .sw { display: none; }
+  .js .sweep.armed { background: transparent; color: var(--green); }
+  .js .sweep.armed::before { clip-path: inset(0 0 0 var(--clip, 100%)); }
+  .js .sweep.armed > .sw { display: block; position: absolute; top: 0; bottom: 0; left: 0; z-index: 6; pointer-events: none; transform: translateX(100vw); will-change: transform; }
+  .sw .sw-pole { position: absolute; top: 0; bottom: 0; left: -4px; width: 8px; background: var(--paper); border-radius: 4px; box-shadow: 0 0 18px rgba(11,79,59,.35); }
+  .sw svg { position: absolute; top: 40px; left: 2px; width: clamp(240px, 56vw, 620px); max-width: none; height: auto; overflow: visible; filter: drop-shadow(0 18px 24px rgba(11,79,59,.3)); }
+  .sw svg .cloth { fill: var(--pink); transform-box: fill-box; transform-origin: 0% 50%; animation: flutter .33s ease-in-out infinite; }
+  .js .sweep.armed:not(.done) .wrap { opacity: 0; }
+  .js .sweep.done .wrap { opacity: 1; transition: opacity .4s var(--out); }
 
   /* COURSES */
-  .courses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  @media (max-width: 900px) { .courses { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .courses { grid-template-columns: 1fr; } }
-  .course img { border-radius: 14px; background: var(--cream); aspect-ratio: 3/2; object-fit: cover; }
-  .course .name { font-size: 15px; font-weight: 600; margin-top: 12px; }
-  .course .where { font-family: var(--mono); font-size: 12.5px; color: var(--fg-mute); margin-top: 2px; }
-  .roster-lead {
-    margin-top: 40px; font-family: var(--mono); font-size: 12px;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-mute);
+  .courses { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 16px; margin-top: 56px; }
+  .course { position: relative; }
+  .course:nth-child(3n+1) .print { transform: rotate(-2deg); }
+  .course:nth-child(3n+2) .print { transform: rotate(1.6deg); }
+  .course:nth-child(3n)   .print { transform: rotate(-.8deg); }
+  .course:last-child { grid-column: 1 / -1; width: calc(50% - 9px); justify-self: center; }
+  .course .tape { --tr: 3deg; }
+  .course:nth-child(even) .tape { --tr: -4deg; }
+  .course .free { position: absolute; z-index: 4; right: -10px; top: -22px; width: 70px; height: 70px; font-size: 9.5px; }
+  .course .cflag { position: absolute; z-index: 5; left: 10%; top: -40px; width: 22px; transform: rotate(-10deg); }
+  .courses-note { margin-top: 52px; font-size: 17px; color: var(--mist); max-width: 40em; }
+  .courses-note strong { color: var(--cream); font-weight: 600; }
+  @media (min-width: 760px) {
+    .courses { grid-template-columns: repeat(3, 1fr); gap: 56px 40px; margin-top: 84px; }
+    .course:last-child { grid-column: auto; width: auto; }
+    .course:nth-child(3n+2) { margin-top: 28px; }
+    .course .free { width: 86px; height: 86px; font-size: 11px; right: -18px; top: -26px; }
+    .course .cflag { width: 30px; top: -54px; }
   }
-  .roster {
-    margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 10px;
-    font-family: var(--mono); font-size: 13.5px; color: var(--fg-dim);
+  @media (min-width: 1100px) {
+    .courses { gap: 60px 64px; max-width: 960px; margin-left: auto; margin-right: auto; }
+    .courses-note { text-align: center; margin-left: auto; margin-right: auto; }
   }
-  .roster span { background: var(--cream); padding: 6px 13px; border-radius: 999px; }
 
   /* FORMATS */
-  .formats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  @media (max-width: 820px) { .formats { grid-template-columns: 1fr; } }
-  .fmt { background: var(--cream); border-radius: 18px; padding: 28px 26px; }
-  .fmt h3 { font-family: var(--serif); font-size: 25px; color: var(--green); margin-bottom: 8px; }
-  .fmt p { font-size: 15px; color: #4c5b53; font-weight: 300; line-height: 1.55; }
-  .screen video { cursor: pointer; }
-  .screen video:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
-  /* GLYPHS:START */
-  /* ── Extruded glyphs ──────────────────────────────────────────────
-     The app spins these in SceneKit: one bezier extruded along Z,
-     pennant-pink faces, deeper walls, a slow turn about Y. The browser
-     has no extrude, so each is a stack of copies stepped along Z inside
-     a preserve-3d parent. Same silhouette, same colors, same period. */
-  .gl-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
-  .gl {
-    width: 116px; height: 116px; margin: 0 auto;
-    display: grid; place-items: center;
-    perspective: 754px;
-    /* The app stands these on the clubhouse green, which is what makes
-       the pink carry. Same plinth here. */
-    background: var(--green); border-radius: 27px;
+  .formats { list-style: none; display: grid; gap: 18px; margin-top: 52px; }
+  .fmt { background: var(--paper); padding: 26px 24px 26px; position: relative;
+         box-shadow: 0 1px 1px rgba(0,0,0,.05), 0 18px 34px -20px rgba(24,36,28,.45);
+         display: grid; grid-template-columns: 56px 1fr; gap: 18px; align-items: start; }
+  .fmt .ico { width: 56px; height: 56px; border-radius: 14px; background: var(--green); display: grid; place-items: center; }
+  .fmt .ico svg { width: 34px; height: 34px; fill: var(--pink); }
+  .fmt p { color: var(--dim); font-size: 16px; margin-top: 6px; }
+  .fmt .tag { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--green);
+              border: 1.5px solid currentColor; border-radius: 999px; padding: 3px 10px; }
+  @media (min-width: 900px) {
+    .formats { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .fmt { grid-template-columns: 1fr; padding: 32px 30px 34px; }
+    .fmt:nth-child(2) { transform: translateY(24px); }
   }
-  .gl-spin {
-    position: relative; width: 116px; height: 116px;
-    transform-style: preserve-3d;
-    animation: gl-turn var(--turn, 9s) linear infinite;
-  }
-  .gl-spin > svg {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    transform: translateZ(var(--z));
-    fill: #e08aab;                 /* BrandCoin.pennantDeep, the walls */
-  }
-  .gl-spin > svg.f { fill: var(--pink); }   /* pennant, the two faces */
-  @keyframes gl-turn { to { transform: rotateY(360deg); } }
 
-  /* A object spinning forever is a nuisance if motion is a problem.
-     Hold it at a three-quarter angle, where the extrusion still reads. */
-  @media (prefers-reduced-motion: reduce) {
-    .gl-spin { animation: none; transform: rotateY(-24deg); }
+  /* QUOTE */
+  .quote { padding: 40px 0 96px; }
+  .quote figure { max-width: 900px; margin: 0 auto; text-align: center; position: relative; }
+  .quote blockquote p { font-family: var(--serif); font-weight: 700; font-size: clamp(30px, 6.4vw, 54px); line-height: 1.12; letter-spacing: -0.015em; color: var(--green); text-wrap: balance; }
+  .quote figcaption { margin-top: 22px; font-size: 15px; color: var(--dim); }
+  .quote .flag { width: 18px; height: 46px; margin: 0 auto 26px; }
+  @media (min-width: 900px) { .quote { padding: 56px 0 144px; } }
+
+  /* REPLAYS */
+  .split { display: grid; gap: 52px; align-items: center; }
+  .replay-art { position: relative; width: 78%; max-width: 400px; margin: 0 auto; }
+  .replay-art .print { transform: rotate(-2.5deg); }
+  .replay-art .stamp { position: absolute; right: -8%; bottom: 18%; z-index: 4; }
+  .film-ico { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--green); vertical-align: -8px; margin: 0 2px; }
+  .film-ico svg { width: 16px; height: 16px; fill: var(--cream); }
+  @media (min-width: 900px) {
+    .split { grid-template-columns: 1fr 1fr; gap: 96px; }
+    .split.flip > :first-child { order: 2; }
   }
-  .fmt { text-align: center; }
-  .fmt .gl { margin-bottom: 16px; }
-  /* The section's own mark. It leads the eyebrow, so it lines up with
-     the text column rather than floating centered over left-set type. */
-  .sec > .gl { margin: 0 0 20px; }
-  /* GLYPHS:END */
 
-
-
-  /* PULLQUOTE */
-  .pull { padding: 76px 0; border-bottom: 1px solid var(--rule); }
-  .pull p {
-    font-family: var(--serif); font-size: clamp(24px, 3.6vw, 40px);
-    line-height: 1.25; max-width: 20ch; letter-spacing: -0.01em;
+  /* PRICING */
+  .plans { display: grid; gap: 24px; margin-top: 52px; }
+  .plan { background: var(--paper); padding: 30px 26px 32px; position: relative;
+          box-shadow: 0 1px 1px rgba(0,0,0,.05), 0 22px 40px -22px rgba(24,36,28,.5); }
+  .plan .price { font-family: var(--serif); font-weight: 800; font-size: 56px; line-height: 1; color: var(--green); letter-spacing: -0.02em; margin: 14px 0 6px; }
+  .plan .price small { font-family: var(--sans); font-size: 16px; font-weight: 500; letter-spacing: 0; color: var(--dim); margin-left: 6px; }
+  .plan ul { list-style: none; margin-top: 18px; display: grid; gap: 10px; }
+  .plan li { padding-left: 28px; position: relative; font-size: 16px; }
+  .plan li::before { content: ''; position: absolute; left: 2px; top: .5em; width: 12px; height: 12px; border-radius: 50%; background: var(--pink); box-shadow: inset 0 0 0 2px var(--deep); }
+  .plan li.no { color: var(--dim); }
+  .plan li.no::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--dim); }
+  .plan .or { margin-top: 20px; padding-top: 18px; border-top: 1px dashed rgba(39,107,80,.35); font-size: 16px; }
+  .plan .or strong { color: var(--green); }
+  .plan.full { box-shadow: inset 0 0 0 2px var(--green), 0 22px 40px -22px rgba(24,36,28,.5); }
+  .plan.full .pflag { position: absolute; right: 26px; top: -44px; width: 26px; transform: rotate(8deg); }
+  .invite { margin-top: 28px; display: flex; gap: 16px; align-items: flex-start; background: rgba(242,169,196,.28); padding: 20px 22px; border-radius: 14px; }
+  .invite .num { flex: none; margin: 0; width: 34px; height: 34px; font-size: 15px; }
+  .invite p { font-size: 16px; }
+  .invite strong { color: var(--deep); }
+  .fine { margin-top: 22px; font-size: 14px; color: var(--dim); }
+  @media (min-width: 900px) {
+    .plans { grid-template-columns: 1fr 1fr; gap: 36px; }
+    .plan { padding: 40px 40px 42px; }
   }
-  .pull .who { font-family: var(--mono); font-size: 13px; color: var(--fg-mute); margin-top: 22px;
-    display: flex; align-items: center; justify-content: center; gap: 10px; }
-  /* A drawn rule instead of a dash character, so the attribution still
-     reads as an attribution. */
-  .pull .who::before { content: ''; width: 26px; height: 1px; background: currentColor; opacity: 0.55; }
+
+  /* PROMO */
+  .promo .card {
+    position: relative; background: var(--paper); padding: 28px 22px 30px; display: grid; gap: 32px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05), 0 26px 44px -24px rgba(24,36,28,.5);
+    outline: 2px dashed rgba(39,107,80,.4); outline-offset: -12px;
+  }
+  .promo .when { display: inline-block; background: var(--pink); color: var(--deep); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; margin-bottom: 18px; }
+  .promo h2 { font-size: clamp(34px, 8vw, 56px); }
+  .promo ol { list-style: none; display: grid; gap: 14px; margin-top: 26px; }
+  .promo li { display: flex; gap: 14px; align-items: flex-start; font-size: 17px; }
+  .promo li .num { flex: none; margin: 0; width: 32px; height: 32px; font-size: 14px; }
+  .promo .sig { margin-top: 24px; font-size: 17px; color: var(--ink); }
+  .promo .sig a { color: var(--green); font-weight: 600; }
+  .promo .art { position: relative; width: 72%; max-width: 330px; margin: 0 auto; }
+  .promo .art .print { transform: rotate(3deg); }
+  .promo .art .stamp { position: absolute; left: -12%; top: 10%; z-index: 4; transform: rotate(-14deg); }
+  @media (min-width: 900px) {
+    .promo .card { grid-template-columns: 1.25fr 1fr; align-items: center; padding: 64px 64px; gap: 56px; }
+  }
+
+  /* NEXT + NOTE */
+  .next { list-style: none; display: grid; gap: 0; margin-top: 44px; border-top: 1px solid rgba(39,107,80,.22); }
+  .next li { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid rgba(39,107,80,.22); }
+  .next li strong { font-family: var(--serif); font-weight: 700; font-size: 21px; color: var(--green); letter-spacing: -0.01em; line-height: 1.2; }
+  .next li span { display: block; font-size: 15px; color: var(--dim); margin-top: 2px; }
+  .next em { font-style: normal; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--green); white-space: nowrap; }
+  .next li.dream em { color: var(--deep); background: var(--pink); padding: 3px 9px; border-radius: 999px; }
+  .letter { position: relative; background: var(--paper); padding: 40px 28px 34px; transform: rotate(-1deg);
+            box-shadow: 0 1px 1px rgba(0,0,0,.05), 0 24px 44px -24px rgba(24,36,28,.5); }
+  .letter p { font-size: 18px; line-height: 1.6; color: var(--ink); }
+  .letter p + p { margin-top: 14px; }
+  .letter .from { font-family: var(--serif); font-weight: 700; font-size: 26px; color: var(--green); margin-top: 20px; }
+  .letter a { color: var(--green); font-weight: 600; }
+  .letter .tape { width: 120px; margin-left: -60px; }
+
+  /* CLOSE */
+  .close { text-align: center; }
+  .close .wrap { display: grid; justify-items: center; }
+  .close .mark { width: 104px; margin-bottom: 30px; position: relative; }
+  .close .mark img { width: 100%; height: auto; }
+  .close .mflag { position: absolute; left: 66.7%; top: 0; width: 25.4%; }
+  .close .mflag svg { width: 100%; height: auto; }
+  .close h2 { margin: 0 auto; max-width: 14ch; }
+  .close .lede { margin: 20px auto 0; }
+  .close .act { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px 16px; margin-top: 34px; }
+  .close .note { margin-top: 16px; }
 
   /* FOOT */
-  /* THE CLOSE: a green band bookending the hero, and the only ask on
-     the page. It hands you a half-written message, which is the same
-     move the game makes. */
-  .close {
-    margin: 0 -40px; padding: 84px 40px 88px;
-    background: var(--green); color: var(--cream);
-    text-align: center;
-  }
-  @media (max-width: 600px) { .close { margin: 0 -20px; padding: 60px 20px 64px; } }
-  .close .mark { width: 66px; margin: 0 auto 24px; }
-  .close h2 {
-    font-family: var(--serif); font-weight: 700;
-    font-size: clamp(30px, 4.4vw, 46px); line-height: 1.08;
-    letter-spacing: -0.015em; color: var(--cream);
-    max-width: 18ch; margin: 0 auto; text-wrap: balance;
-  }
-  .close p {
-    margin: 18px auto 0; max-width: 40ch;
-    font-size: 17px; font-weight: 300; line-height: 1.6;
-    color: rgba(246,239,216,.82); text-wrap: pretty;
-  }
-  .close .badges { margin-top: 32px; justify-content: center; }
-  .close .cta { background: var(--cream); color: var(--green); border: 0; cursor: pointer;
-                font-family: var(--sans); }
-  .close .cta:hover { background: #fff; color: var(--green-d); }
-  .close .cta-note { color: rgba(246,239,216,.66); }
+  .foot { padding: 36px 0 44px; font-size: 14px; color: var(--dim); }
+  .foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; }
+  .foot nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .foot a { color: var(--ink); text-decoration: none; min-height: 24px; display: inline-block; }
+  .foot a:hover { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
 
-  .foot {
-    padding: 48px 0 8px; display: flex; justify-content: space-between;
-    flex-wrap: wrap; gap: 18px; font-size: 14px; color: var(--fg-dim);
+  /* SCROLL-IN: type rises, prints drop and settle */
+  .js .rv { opacity: 0; transform: translateY(28px); }
+  .js .rv.in { opacity: 1; transform: none; transition: opacity .4s var(--out) var(--d, 0s), transform .4s var(--out) var(--d, 0s); }
+  .js .dp { opacity: 0; translate: 0 -70px; scale: 1.06; rotate: 7deg; }
+  .js .dp.in { opacity: 1; translate: 0 0; scale: 1; rotate: 0deg;
+    transition: opacity .3s var(--out) var(--d, 0s), translate .6s var(--settle) var(--d, 0s), scale .6s var(--settle) var(--d, 0s), rotate .6s var(--settle) var(--d, 0s); }
+  .js .pk { opacity: 0; scale: 1.3; }
+  .js .pk.in { opacity: 1; scale: 1; transition: opacity .2s var(--out) var(--d, 0s), scale .28s var(--punch) var(--d, 0s); }
+  .js .fl { opacity: 0; translate: 120px -90px; }
+  .js .fl.in { opacity: 1; translate: 0 0; animation: plant .9s var(--settle) var(--d, 0s) backwards; }
+  @keyframes plant {
+    0%   { opacity: 0; translate: 140px -110px; rotate: 18deg; }
+    55%  { opacity: 1; translate: 0 6px; rotate: -4deg; scale: 1 .88; }
+    75%  { translate: 0 0; rotate: 3deg; scale: 1 1.03; }
+    100% { translate: 0 0; rotate: 0deg; scale: 1 1; }
   }
-  .foot nav { display: flex; gap: 24px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flag .cloth, .sw svg .cloth { animation: none; }
+    .js .rv, .js .dp, .js .pk, .js .fl { opacity: 1; transform: none; translate: none; scale: none; rotate: none; animation: none; transition: none; }
+    .js .sweep.armed::before { clip-path: none; }
+    .js .sweep.armed > .sw { display: none; }
+    .js .sweep.armed .wrap { opacity: 1; }
+    .js .sweep.armed { color: var(--cream); }
+  }
 </style>
 
 <script type="application/ld+json">
@@ -377,20 +425,21 @@
   "applicationSubCategory": "Sports Game",
   "operatingSystem": "iOS",
   "url": "https://mountainmediadigital.com/g/",
-  "downloadUrl": "https://apps.apple.com/us/app/golf-game-g/id6790259018",
+  "downloadUrl": "https://apps.apple.com/app/apple-store/id6790259018?pt=128826739&ct=website&mt=8",
   "image": "https://mountainmediadigital.com/g/og-card.jpg",
   "description": "Asynchronous head-to-head golf played inside an iMessage conversation. Play your hole, send it, and your friend plays the same hole and sends it back. Nine courses, three formats.",
   "featureList": [
     "Play inside an iMessage thread",
     "Nine courses",
     "Stroke, Match and Skins",
-    "Ghost replay of your rival's shots"
+    "Ghost replay of your rival's shots",
+    "Save hole replays to the Locker and export them as films"
   ],
   "offers": {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD",
-    "description": "Free to play, with optional in-app purchases."
+    "description": "Free to download with The Gyre included. Unlock the full game for $10, or courses for $1.99 each."
   },
   "publisher": {
     "@type": "Organization",
@@ -407,399 +456,414 @@
 </script>
 </head>
 <body>
-<!-- GLYPHS:START -->
-<svg class="gl-defs" aria-hidden="true" focusable="false"><defs>
-    <path id="gl-bubble" fill-rule="evenodd" d="M-0.62 -1.1 H0.62 A0.48 0.48 0 0 1 1.1 -0.62 V0.62 A0.48 0.48 0 0 1 0.62 1.1 H-0.62 A0.48 0.48 0 0 1 -1.1 0.62 V-0.62 A0.48 0.48 0 0 1 -0.62 -1.1 Z M0.66 -0.10 C0.66 -0.40 0.36 -0.65 0 -0.65 C-0.36 -0.65 -0.66 -0.40 -0.66 -0.10 C-0.66 0.15 -0.60 0.22 -0.50 0.30 C-0.52 0.42 -0.54 0.55 -0.62 0.66 C-0.40 0.60 -0.28 0.45 0 0.45 C0.36 0.45 0.66 0.20 0.66 -0.10 Z"/>
-    <mask id="gl-coin-mask" maskUnits="userSpaceOnUse"
-          x="-2.02" y="-2.02" width="4.04" height="4.04">
-      <circle cx="0" cy="0" r="1.15" fill="#fff"/>
-      <text x="0" y="0" fill="#000" font-family="'Playfair Display',Georgia,serif"
-            font-weight="600" font-size="1.72" text-anchor="middle"
-            dominant-baseline="central">G</text>
-    </mask>
-    <g id="gl-coin"><circle cx="0" cy="0" r="1.15" mask="url(#gl-coin-mask)"/></g>
-    <g id="gl-match" fill-rule="evenodd">
-      <g transform="scale(0.002587) translate(-350.30 -521.80)">
-        <path d="M55.2,1014.6c0,16.4-11.8,28.8-27.2,29-15.5.1-28-12.2-28-28.5V264.2S0,24.4,0,24.4C2.6,10,14.1-.2,28.2,0c12.9.2,26.9,10.5,26.9,25v252.6c.1,0,.1,737,.1,737Z"/>
-        <path d="M302.7,152.9l-181.2,85.1-60.2,29.3V40.2s241.2,102.6,241.2,102.6c3.4,1.4,2.5,7.7.1,10.1Z"/>
-        <path d="M451.1,1014.6c0,16.4-11.8,28.8-27.2,29-15.5.1-28-12.2-28-28.5V264.2s0-239.8,0-239.8C398.5,10,409.9-.2,424,0c12.9.2,26.9,10.5,26.9,25v252.6c.1,0,.1,737,.1,737Z"/>
-        <path d="M698.5,152.9l-181.2,85.1-60.2,29.3V40.2s241.2,102.6,241.2,102.6c3.4,1.4,2.5,7.7.1,10.1Z"/>
-      </g>
-    </g>
-    <g id="gl-stroke" fill-rule="evenodd">
-      <g transform="scale(0.002930) translate(-360.65 -460.80)">
-        <path d="M49.8,890.6c-37-47.6-57.9-140.8-46.8-199.2,5.9-30.8,30.1-53.1,61.5-55.9,16.1-1.5,31.8-.3,48.1,1.3l72.3,8,170.5,28.7,221.9-498.3,62.6-142.6c3.3-7.6,5.6-14.5,11.3-20.4,9.5-9.7,23-13.8,36.6-11.5,12.3,2.1,24,10,29.8,22.5,5.6,12.1,4.7,25-.8,37.3l-224.8,503.8-112.3,251.3c-9.7,21.6-47.5,44.4-70.2,55.5-54.9,26.9-113.9,44.2-174.9,50.1s-27.3.2-40.6-2.3c-17.9-3.3-33.1-14-44.1-28.2ZM255.8,777.6c0-47.2-38.2-85.4-85.3-85.4s-85.3,38.2-85.3,85.4,38.2,85.4,85.3,85.4,85.3-38.2,85.3-85.4Z"/>
-      </g>
-    </g>
-</defs></svg>
-<!-- GLYPHS:END -->
-<div class="page">
+<a class="skip" href="#main">Skip to content</a>
 
-  <div class="top">
-    <div class="meta">Mountain Media Digital LLC <span>·</span> La Conner, WA</div>
-    <nav>
-      <a href="/">Studio</a>
-      <a href="#how">How it works</a>
-      <a href="#courses">Courses</a>
+<header class="top">
+  <div class="wrap">
+    <a class="home" href="/g/" aria-label="G home"><img src="mark-green.svg" alt="G" width="46" height="29"><span class="by">by Mountain Media Digital</span></a>
+    <nav aria-label="G">
+      <a class="opt" href="#how">How it plays</a>
+      <a class="opt" href="#courses">Courses</a>
+      <a href="#pricing">Pricing</a>
       <a href="/g-support.html">Support</a>
+      <a class="pill" href="https://apps.apple.com/app/apple-store/id6790259018?pt=128826739&amp;ct=website&amp;mt=8">Get G</a>
     </nav>
   </div>
+</header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <img class="mark" src="g-mark.svg" alt="G">
-    <h1>Golf that lives in your iMessages.</h1>
-    <p class="sub">
-      Play your hole and send it. Your friend plays the same one and sends it
-      back, inside the conversation you're already having.
-    </p>
-    <div class="badges">
-      <a class="cta" href="https://apps.apple.com/us/app/golf-game-g/id6790259018">Get G on the App Store</a>
-      <a class="cta quiet" href="#how">See how it plays</a>
-      <span class="cta-note">Free on iPhone and iPad</span>
-    </div>
-  </section>
+<main id="main">
 
-  <!-- FILM -->
-  <section class="film" id="film">
-    <div class="eyebrow">The feel</div>
-    <h2>Look at the hole. Then hit it.</h2>
-    <div class="film-grid">
-      <div class="plate">
-        <div class="screen">
-          <video data-src="flyover.mp4" poster="p-flyover.jpg" muted loop playsinline
-                 preload="metadata" tabindex="0" role="button"
-                 aria-label="Gameplay clip. Activate to play or pause."></video>
-        </div>
-        <p class="cap">No. 1 at Coral Cay. Every hole opens with a flyover.</p>
-      </div>
-      <div class="plate">
-        <div class="screen">
-          <video data-src="drive.mp4" poster="p-drive.jpg" muted loop playsinline
-                 preload="metadata" tabindex="0" role="button"
-                 aria-label="Gameplay clip. Activate to play or pause."></video>
-        </div>
-        <p class="cap">One flick up the screen, and the camera rides the ball out.</p>
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap">
+    <div>
+      <div class="label rv" style="--d:.05s">Golf Game G · for iMessage</div>
+      <h1 id="hero-h"><span class="ln rv" style="--d:.17s">Golf that lives</span> <span class="ln rv" style="--d:.29s">in your iMessages.</span></h1>
+      <p class="sub rv" style="--d:.41s">Play your hole and send it. Your friend plays the same one and sends it back, inside the conversation you're already having.</p>
+      <div class="act rv" style="--d:.53s">
+        <a class="badge" href="https://apps.apple.com/app/apple-store/id6790259018?pt=128826739&amp;ct=website&amp;mt=8"><img src="app-store-badge.svg" alt="Download G on the App Store" width="162" height="54"></a>
+        <span class="note">Free to download · iPhone and iPad</span>
       </div>
     </div>
-  </section>
+    <div class="collage" role="img" aria-label="Three taped photo prints of G courses: Coral Cay, Concrete Jungle and The Gyre, with a pink flag stuck in the top print.">
+      <div class="print bare c1 dp" style="--d:.25s"><div class="ph"><picture><source type="image/webp" srcset="prints/coral-cay.webp"><img src="prints/coral-cay.jpg" alt="" width="600" height="750"></picture></div></div>
+      <div class="print bare c2 dp" style="--d:.42s"><div class="ph"><picture><source type="image/webp" srcset="prints/concrete-jungle.webp"><img src="prints/concrete-jungle.jpg" alt="" width="600" height="750"></picture></div></div>
+      <div class="print bare c3 dp" style="--d:.6s"><span class="tape" style="--tr:-2deg"></span><div class="ph"><picture><source type="image/webp" srcset="prints/the-gyre.webp"><img src="prints/the-gyre.jpg" alt="" width="600" height="750"></picture></div></div>
+      <div class="hflag fl" style="--d:1.05s"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg></div>
+    </div>
+  </div>
+</section>
 
-  <!-- HOW -->
-  <section class="sec" id="how">
-    <div class="eyebrow">The loop</div>
-    <h2>One hole. Back and forth.</h2>
-    <p class="lede">
-      G is an iMessage app, so a round is just a conversation you're already having.
-      Nothing to schedule. The round lives in the thread.
-    </p>
-    <div class="steps">
-      <div class="step">
-        <div class="n">1</div>
-        <h3>Open an iMessage thread</h3>
-        <p>Tap the apps button beside the text field and pick the G. Choose three random holes, the front nine, or the back nine.</p>
+<!-- FEEL -->
+<section class="sec feel tight" id="film" aria-labelledby="feel-h">
+  <div class="wrap">
+    <div>
+      <div class="label rv">The feel</div>
+      <h2 id="feel-h" class="rv" style="--d:.12s">Look at the hole. Then hit it.</h2>
+      <p class="lede rv" style="--d:.24s">Every hole opens with a flyover. One light flick up the screen is the whole swing, and the camera rides the ball out.</p>
+    </div>
+    <div class="reel">
+      <figure class="print dp">
+        <span class="tape" style="--tr:-4deg"></span>
+        <div class="ph"><video data-src="flyover.mp4" poster="p-flyover.jpg" muted loop playsinline preload="none" tabindex="0" aria-label="Gameplay clip: the flyover at Coral Cay, hole 1. Press Space or Enter to play or pause." width="540" height="1048"></video></div>
+        <figcaption class="cap"><span><b>The flyover</b>No. 1 at Coral Cay</span><button class="pp" type="button" aria-pressed="false" aria-label="Play the flyover clip"><svg class="i-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg><svg class="i-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1h3v10H2zM7 1h3v10H7z"/></svg></button></figcaption>
+      </figure>
+      <figure class="print dp" style="--d:.2s">
+        <span class="tape" style="--tr:3deg"></span>
+        <div class="ph"><video data-src="drive.mp4" poster="p-drive.jpg" muted loop playsinline preload="none" tabindex="0" aria-label="Gameplay clip: a drive, with the camera following the ball. Press Space or Enter to play or pause." width="540" height="1048"></video></div>
+        <figcaption class="cap"><span><b>The flick</b>and the ride out</span><button class="pp" type="button" aria-pressed="false" aria-label="Play the drive clip"><svg class="i-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg><svg class="i-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1h3v10H2zM7 1h3v10H7z"/></svg></button></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="sec tight" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="label rv">How it plays</div>
+    <h2 id="how-h" class="rv" style="--d:.12s">One hole. Back and forth.</h2>
+    <p class="lede rv" style="--d:.24s">G is an iMessage app, so a round is just a conversation you're already having. Nothing to schedule. The round lives in the thread.</p>
+    <ol class="steps">
+      <li class="step">
+        <div class="print dp"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="t-invite.webp"><img src="t-invite.jpg" alt="The G app open in an iMessage conversation" loading="lazy" width="900" height="1955"></picture></div></div>
+        <div class="rv" style="--d:.15s"><div class="num" aria-hidden="true">1</div><h3>Open an iMessage thread</h3><p>Tap the apps button beside the text field and pick G.</p></div>
+      </li>
+      <li class="step">
+        <div class="print dp"><span class="tape" style="--tr:4deg"></span><div class="ph"><picture><source type="image/webp" srcset="t-bubble.webp"><img src="t-bubble.jpg" alt="A finished hole waiting to send in the message field" loading="lazy" width="900" height="1955"></picture></div></div>
+        <div class="rv" style="--d:.15s"><div class="num" aria-hidden="true">2</div><h3>Play your hole and send it</h3><p>A light flick is the whole swing. Finish the hole and it goes out as the message.</p></div>
+      </li>
+      <li class="step">
+        <div class="print dp"><span class="tape" style="--tr:-2deg"></span><div class="ph"><picture><source type="image/webp" srcset="t-replay.webp"><img src="t-replay.jpg" alt="A ghost replay of the opponent's round" loading="lazy" width="900" height="1955"></picture></div></div>
+        <div class="rv" style="--d:.15s"><div class="num" aria-hidden="true">3</div><h3>They play the same hole</h3><p>It comes back to you with their shots drawn over yours. Your move.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- COURSES (the flag sweeps cream to green) -->
+<section class="sec green sweep" id="courses" aria-labelledby="courses-h">
+  <div class="sw" aria-hidden="true"><div class="sw-pole"></div><svg viewBox="0 0 22 15.3"><path class="cloth" d="M0 0 21.4 7.7 0 15.3Z"/></svg></div>
+  <div class="wrap">
+    <div class="label"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg>Nine courses</div>
+    <h2 id="courses-h">Nine worlds, not nine reskins.</h2>
+    <p class="lede">Every course has its own horizon, its own light, and its own sound: songbirds, rain in the pines, gulls over the wash, a city humming in the distance.</p>
+    <ul class="courses">
+      <li class="course">
+        <span class="cflag fl" style="--d:.5s"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg></span>
+        <span class="stamp free pk" style="--d:.7s">Free<br>to play</span>
+        <figure class="print dp"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/the-gyre.webp"><img src="prints/the-gyre.jpg" alt="The Gyre: a golfer addressing the ball under a big hill" loading="lazy" width="600" height="750"></picture></div><figcaption><b>The Gyre</b>first tee's open</figcaption></figure>
+      </li>
+      <li class="course"><figure class="print dp" style="--d:.08s"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/lake-pines.webp"><img src="prints/lake-pines.jpg" alt="Lake Pines: a fairway between pines and a lake" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Lake Pines</b>beneath steep peaks</figcaption></figure></li>
+      <li class="course"><figure class="print dp" style="--d:.16s"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/canyon-run.webp"><img src="prints/canyon-run.jpg" alt="Canyon Run: red rock and cactus" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Canyon Run</b>red rock and cactus</figcaption></figure></li>
+      <li class="course"><figure class="print dp"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/coral-cay.webp"><img src="prints/coral-cay.jpg" alt="Coral Cay: an island green on open sea" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Coral Cay</b>island target golf, open sea</figcaption></figure></li>
+      <li class="course"><figure class="print dp" style="--d:.08s"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/grassroots.webp"><img src="prints/grassroots.jpg" alt="Grassroots: golf at ant height in a backyard" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Grassroots</b>ant height in the backyard</figcaption></figure></li>
+      <li class="course"><figure class="print dp" style="--d:.16s"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/gnome-hollow.webp"><img src="prints/gnome-hollow.jpg" alt="Gnome Hollow: cottages in steady rain" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Gnome Hollow</b>cottages, and steady rain</figcaption></figure></li>
+      <li class="course"><figure class="print dp"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/concrete-jungle.webp"><img src="prints/concrete-jungle.jpg" alt="Concrete Jungle: city towers after dark" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Concrete Jungle</b>down the avenues, after dark</figcaption></figure></li>
+      <li class="course"><figure class="print dp" style="--d:.08s"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/gorse-head.webp"><img src="prints/gorse-head.jpg" alt="Gorse Head: links on the bluffs at sunset" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Gorse Head</b>links on the bluffs</figcaption></figure></li>
+      <li class="course"><figure class="print dp" style="--d:.16s"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/proving-ground.webp"><img src="prints/proving-ground.jpg" alt="Proving Ground: a fairway lined with tall trees" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Proving Ground</b>tied? one more hole</figcaption></figure></li>
+    </ul>
+    <p class="courses-note"><strong>The Gyre is free.</strong> Any other course is free to play when a friend who owns it starts the round.</p>
+  </div>
+</section>
+
+<!-- FORMATS -->
+<section class="sec" aria-labelledby="fmt-h">
+  <div class="wrap">
+    <div class="label rv">Three formats</div>
+    <h2 id="fmt-h" class="rv" style="--d:.12s">Pick your needle.</h2>
+    <p class="lede rv" style="--d:.24s">Each format speaks its own language on the card, and the bubble always says it in names, because both of you are reading the same message.</p>
+    <ul class="formats">
+      <li class="fmt rv">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 700.6 1043.6"><path d="M49.8,890.6c-37-47.6-57.9-140.8-46.8-199.2,5.9-30.8,30.1-53.1,61.5-55.9,16.1-1.5,31.8-.3,48.1,1.3l72.3,8,170.5,28.7,221.9-498.3,62.6-142.6c3.3-7.6,5.6-14.5,11.3-20.4,9.5-9.7,23-13.8,36.6-11.5,12.3,2.1,24,10,29.8,22.5,5.6,12.1,4.7,25-.8,37.3l-224.8,503.8-112.3,251.3c-9.7,21.6-47.5,44.4-70.2,55.5-54.9,26.9-113.9,44.2-174.9,50.1s-27.3.2-40.6-2.3c-17.9-3.3-33.1-14-44.1-28.2ZM255.8,777.6c0-47.2-38.2-85.4-85.3-85.4s-85.3,38.2-85.3,85.4,38.2,85.4,85.3,85.4,85.3-38.2,85.3-85.4Z" fill-rule="evenodd"/></svg></div>
+        <div><h3>Stroke</h3><p>Lowest total wins the round. The honest one.</p></div>
+      </li>
+      <li class="fmt rv" style="--d:.06s">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 700.6 1043.6"><path d="M55.2,1014.6c0,16.4-11.8,28.8-27.2,29-15.5.1-28-12.2-28-28.5V264.2S0,24.4,0,24.4C2.6,10,14.1-.2,28.2,0c12.9.2,26.9,10.5,26.9,25v252.6c.1,0,.1,737,.1,737Z"/><path d="M302.7,152.9l-181.2,85.1-60.2,29.3V40.2s241.2,102.6,241.2,102.6c3.4,1.4,2.5,7.7.1,10.1Z"/><path d="M451.1,1014.6c0,16.4-11.8,28.8-27.2,29-15.5.1-28-12.2-28-28.5V264.2s0-239.8,0-239.8C398.5,10,409.9-.2,424,0c12.9.2,26.9,10.5,26.9,25v252.6c.1,0,.1,737,.1,737Z"/><path d="M698.5,152.9l-181.2,85.1-60.2,29.3V40.2s241.2,102.6,241.2,102.6c3.4,1.4,2.5,7.7.1,10.1Z"/></svg></div>
+        <div><h3>Match</h3><p>Hole by hole. Go three up with two to play and it's over early, dormie and all.</p></div>
+      </li>
+      <li class="fmt rv" style="--d:.12s">
+        <div class="ico" aria-hidden="true"><svg viewBox="0 0 40 40"><defs><mask id="coin"><circle cx="20" cy="20" r="17" fill="#fff"/><text x="20" y="21" fill="#000" font-family="Georgia,serif" font-weight="700" font-size="24" text-anchor="middle" dominant-baseline="central">G</text></mask></defs><circle cx="20" cy="20" r="17" mask="url(#coin)"/></svg></div>
+        <div><h3>Skins</h3><p>Every hole is its own pot. Tie it and the pot carries. The pressure stacks up fast.</p><span class="tag">Full game</span></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- QUOTE (kept verbatim) -->
+<section class="quote" aria-label="What a tester said">
+  <div class="wrap">
+    <figure class="rv">
+      <svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg>
+      <blockquote><p>“Being able to pop in and out without switching apps is super clutch.”</p></blockquote>
+      <figcaption>a tester, on why his friend downloaded it</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- REPLAYS -->
+<section class="sec" id="replays" aria-labelledby="rep-h" style="padding-top:0">
+  <div class="wrap split">
+    <div class="replay-art">
+      <figure class="print dp"><span class="tape"></span><div class="ph"><picture><source type="image/webp" srcset="prints/replay-dusk.webp"><img src="prints/replay-dusk.jpg" alt="A replay frame from a hole played at dusk" loading="lazy" width="600" height="750"></picture></div><figcaption><b>Saved to the Locker</b>replay, ready to export</figcaption></figure>
+      <span class="stamp pk" style="--d:.5s">Every<br>hole</span>
+    </div>
+    <div>
+      <div class="label rv">Replays</div>
+      <h2 id="rep-h" class="rv" style="--d:.12s">Keep the good ones.</h2>
+      <p class="lede rv" style="--d:.24s">After every hole, tap the film icon <span class="film-ico" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M1 3h14v10H1zM2.5 4.5v1.5H4V4.5zm0 3v1.5H4V7.5zm0 3V12H4v-1.5zm9.5-6V6h1.5V4.5zm0 3V9h1.5V7.5zm0 3V12h1.5v-1.5zM5.5 4.5v7h5v-7z" fill-rule="evenodd"/></svg></span> and the replay saves to your Locker. Export it as a film when it's worth showing off.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="sec tight" id="pricing" aria-labelledby="price-h">
+  <div class="wrap">
+    <div class="label rv">Pricing</div>
+    <h2 id="price-h" class="rv" style="--d:.12s">Free to start. Simple to unlock.</h2>
+    <p class="lede rv" style="--d:.24s">Free to download. The Gyre is free. Any course is free to play when a friend who owns it starts the round. Unlock everything for $10, or $1.99 a course.</p>
+    <div class="plans">
+      <div class="plan rv">
+        <h3>Free</h3>
+        <div class="price">$0</div>
+        <ul>
+          <li>Download G and play The Gyre</li>
+          <li>Play any course when a friend who owns it starts the round</li>
+          <li class="no">Skins games, the wardrobe and the color palette stay locked</li>
+        </ul>
       </div>
-      <div class="step">
-        <div class="n">2</div>
-        <h3>Play your hole and send it</h3>
-        <p>A light, fast flick is the whole swing. When you finish the hole, the match travels inside the message bubble.</p>
-      </div>
-      <div class="step">
-        <div class="n">3</div>
-        <h3>They play the same hole</h3>
-        <p>Same wind, same ground. Then it comes back to you with their shots drawn over yours.</p>
+      <div class="plan full rv" style="--d:.1s">
+        <span class="pflag fl" style="--d:.4s"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg></span>
+        <h3>Full game</h3>
+        <div class="price">$10</div>
+        <ul>
+          <li>All nine courses</li>
+          <li>Skins games</li>
+          <li>The wardrobe and the color palette, unlocked</li>
+        </ul>
+        <p class="or">Just want one course? <strong>$1.99 each.</strong></p>
       </div>
     </div>
-  </section>
+    <div class="invite rv"><div class="num" aria-hidden="true">+</div><p><strong>Invites are free.</strong> If a friend owns a course and starts the round, you can play it with them without buying anything.</p></div>
+    <p class="fine rv">Prices in US dollars on the App Store. More things to unlock are coming later.</p>
+  </div>
+</section>
 
-  <!-- COURSES -->
-  <section class="sec" id="courses">
-    <div class="eyebrow">Nine courses</div>
-    <h2>Nine worlds, not nine reskins.</h2>
-    <p class="lede">
-      Every course has its own horizon, its own light, and its own sound: songbirds,
-      rain in the pines, gulls over the wash, a city humming in the distance.
-    </p>
-    <div class="courses">
-      <div class="course">
-        <picture>
-          <source type="image/webp" srcset="w-coralcay.webp">
-          <img src="w-coralcay.jpg" alt="Coral Cay" loading="lazy">
-        </picture>
-        <div class="name">Coral Cay</div>
-        <div class="where">island target golf, open sea</div>
+<!-- PROMO: shown only through Dec 31, 2026 (script below reveals it) -->
+<section class="sec promo" id="ace" aria-labelledby="ace-h" data-until="2027-01-01T00:00:00-08:00" hidden style="padding-top:0">
+  <div class="wrap">
+    <div class="card">
+      <div>
+        <span class="when">Through Dec 31, 2026</span>
+        <div class="label">Hole-in-one challenge</div>
+        <h2 id="ace-h">Ace it. Unlock the full game.</h2>
+        <ol>
+          <li><span class="num" aria-hidden="true">1</span><span>Sink a hole in one.</span></li>
+          <li><span class="num" aria-hidden="true">2</span><span>Tap the film icon, then export your replay from the Locker.</span></li>
+          <li><span class="num" aria-hidden="true">3</span><span>Post it on TikTok and tag <a href="https://www.tiktok.com/@golfgameg">@GolfGameG</a>.</span></li>
+        </ol>
+        <p class="sig">I'll send you a link to unlock everything. <span style="white-space:nowrap">— Keven</span></p>
       </div>
-      <div class="course">
-        <picture>
-          <source type="image/webp" srcset="w-canyonrun.webp">
-          <img src="w-canyonrun.jpg" alt="Canyon Run" loading="lazy">
-        </picture>
-        <div class="name">Canyon Run</div>
-        <div class="where">red rock and cactus</div>
-      </div>
-      <div class="course">
-        <picture>
-          <source type="image/webp" srcset="w-sheepranch.webp">
-          <img src="w-sheepranch.jpg" alt="Gorse Head" loading="lazy">
-        </picture>
-        <div class="name">Gorse Head</div>
-        <div class="where">links on the bluffs</div>
-      </div>
-      <div class="course">
-        <picture>
-          <source type="image/webp" srcset="w-grassroots.webp">
-          <img src="w-grassroots.jpg" alt="Grassroots" loading="lazy">
-        </picture>
-        <div class="name">Grassroots</div>
-        <div class="where">ant height in the backyard</div>
-      </div>
-      <div class="course">
-        <picture>
-          <source type="image/webp" srcset="w-gnomehollow.webp">
-          <img src="w-gnomehollow.jpg" alt="Gnome Hollow" loading="lazy">
-        </picture>
-        <div class="name">Gnome Hollow</div>
-        <div class="where">cottages, and steady rain</div>
-      </div>
-      <div class="course">
-        <picture>
-          <source type="image/webp" srcset="w-concretejungle.webp">
-          <img src="w-concretejungle.jpg" alt="Concrete Jungle" loading="lazy">
-        </picture>
-        <div class="name">Concrete Jungle</div>
-        <div class="where">down the avenues, after dark</div>
+      <div class="art">
+        <figure class="print dp"><span class="tape" style="--tr:4deg"></span><div class="ph"><picture><source type="image/webp" srcset="prints/ace.webp"><img src="prints/ace.jpg" alt="A ball dropping into the cup beside a pink flag" loading="lazy" width="600" height="750"></picture></div><figcaption><b>A real ace</b>The Gyre</figcaption></figure>
+        <span class="stamp pk" style="--d:.45s">Hole<br>in one</span>
       </div>
     </div>
-    <div class="roster-lead">The full nine</div>
-    <div class="roster">
-      <span>The Gyre</span><span>Lake Pines</span><span>Canyon Run</span>
-      <span>Coral Cay</span><span>Grassroots</span><span>Gnome Hollow</span>
-      <span>Concrete Jungle</span><span>Gorse Head</span><span>Proving Ground</span>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FORMATS -->
-  <section class="sec">
-    <div class="eyebrow">Three games</div>
-    <h2>Pick your needle.</h2>
-    <p class="lede">
-      Each format speaks its own language on the card, and the bubble always says it in
-      names, because both of you are reading the same message.
-    </p>
-    <div class="formats">
-      <div class="fmt">
-        <!-- GLYPHS:START -->
-        <div class="gl gl-stroke" style="--turn:9s" aria-hidden="true">
-          <div class="gl-spin">
-          <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-4.31px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.69px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.08px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-2.46px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.85px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.23px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-0.62px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.00px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.62px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.23px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.85px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:2.46px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.08px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.69px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:4.31px" aria-hidden="true"><use href="#gl-stroke"/></svg>
-          </div>
-        </div>
-        <!-- GLYPHS:END -->
-        <h3>Stroke</h3>
-        <p>Lowest total wins the round. The honest one.</p>
-      </div>
-      <div class="fmt">
-        <!-- GLYPHS:START -->
-        <div class="gl gl-match" style="--turn:9s" aria-hidden="true">
-          <div class="gl-spin">
-          <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-4.31px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.69px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.08px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-2.46px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.85px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.23px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-0.62px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.00px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.62px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.23px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.85px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:2.46px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.08px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.69px" aria-hidden="true"><use href="#gl-match"/></svg>
-          <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:4.31px" aria-hidden="true"><use href="#gl-match"/></svg>
-          </div>
-        </div>
-        <!-- GLYPHS:END -->
-        <h3>Match</h3>
-        <p>Hole by hole. Go three up with two to play and it's over early, dormie and all.</p>
-      </div>
-      <div class="fmt">
-        <!-- GLYPHS:START -->
-        <div class="gl gl-coin" style="--turn:8.4s" aria-hidden="true">
-          <div class="gl-spin">
-          <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.16px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-2.58px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-2.01px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.44px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-0.86px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-0.29px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.29px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.86px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.44px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:2.01px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:2.58px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.16px" aria-hidden="true"><use href="#gl-coin"/></svg>
-          </div>
-        </div>
-        <!-- GLYPHS:END -->
-        <h3>Skins</h3>
-        <p>Every hole is its own pot. Tie it and the pot carries. The pressure stacks up fast.</p>
-      </div>
+<!-- NEXT + NOTE FROM KEVEN -->
+<section class="sec tight" id="next" aria-labelledby="next-h">
+  <div class="wrap split">
+    <div>
+      <div class="label rv">What's coming</div>
+      <h2 id="next-h" class="rv" style="--d:.12s">Where G is headed.</h2>
+      <ul class="next">
+        <li class="rv"><div><strong>Group play</strong><span>Up to 8 people in one group chat.</span></div><em>Coming</em></li>
+        <li class="rv" style="--d:.06s"><div><strong>Updated characters</strong></div><em>Coming</em></li>
+        <li class="rv" style="--d:.12s"><div><strong>New courses</strong></div><em>Coming</em></li>
+        <li class="rv" style="--d:.18s"><div><strong>Earn your game</strong><span>Longer drives and other skills, earned as you play.</span></div><em>Coming</em></li>
+        <li class="rv dream" style="--d:.24s"><div><strong>Online tournaments</strong><span>The big idea: G as an online game, with tournaments to win stuff.</span></div><em>The dream</em></li>
+      </ul>
     </div>
-  </section>
+    <aside class="letter dp" aria-label="A note from Keven">
+      <span class="tape"></span>
+      <p>Hey, I'm Keven. I make G.</p>
+      <p>It's new, it's small, and I'm building it in the open. That list is what I'm working on, in roughly that order. It isn't finished, and that's the fun part.</p>
+      <p>If something feels off or you have an idea, <a href="/g-support.html">tell me</a>, or find me on TikTok at <a href="https://www.tiktok.com/@golfgameg">@GolfGameG</a>. That's how the next version gets better.</p>
+      <p class="from">— Keven</p>
+    </aside>
+  </div>
+</section>
 
-  <!-- PULL -->
-  <section class="pull">
-    <p>“Being able to pop in and out without switching apps is super clutch.”</p>
-    <div class="who">a tester, on why his friend downloaded it</div>
-  </section>
-
-  <!-- IN THE THREAD -->
-  <section class="sec">
-    <!-- GLYPHS:START -->
-    <div class="gl gl-bubble" style="--turn:9s" aria-hidden="true">
-      <div class="gl-spin">
-      <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:-6.46px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-5.87px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-5.29px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-4.70px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-4.11px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-3.52px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-2.94px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-2.35px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.76px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-1.17px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:-0.59px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.00px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:0.59px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.17px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:1.76px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:2.35px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:2.94px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:3.52px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:4.11px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:4.70px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:5.29px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg viewBox="-2.02 -2.02 4.04 4.04" style="--z:5.87px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      <svg class="f" viewBox="-2.02 -2.02 4.04 4.04" style="--z:6.46px" aria-hidden="true"><use href="#gl-bubble"/></svg>
-      </div>
+<!-- CLOSE (second flag sweep) -->
+<section class="sec green sweep close" aria-labelledby="close-h">
+  <div class="sw" aria-hidden="true"><div class="sw-pole"></div><svg viewBox="0 0 22 15.3"><path class="cloth" d="M0 0 21.4 7.7 0 15.3Z"/></svg></div>
+  <div class="wrap">
+    <div class="mark" role="img" aria-label="G"><img src="mark-cream-noflag.svg" alt="" width="92" height="58"><span class="mflag fl" style="--d:.7s"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg></span></div>
+    <h2 id="close-h">Someone in your messages owes you a round.</h2>
+    <p class="lede">Send them a hole. The first one is a message they open whenever.</p>
+    <div class="act">
+      <a class="badge" href="https://apps.apple.com/app/apple-store/id6790259018?pt=128826739&amp;ct=website&amp;mt=8"><img src="app-store-badge.svg" alt="Download G on the App Store" width="162" height="54"></a>
+      <a class="pill ghost" id="share" href="sms:&amp;body=Golf%20you%20play%20inside%20a%20text.%20https%3A%2F%2Fapps.apple.com%2Fapp%2Fapple-store%2Fid6790259018%3Fpt%3D128826739%26ct%3Dwebsite%26mt%3D8">Send it to someone</a>
     </div>
-    <!-- GLYPHS:END -->
-    <div class="eyebrow">In the thread</div>
-    <h2>It looks like a message, because it is one.</h2>
-    <p class="lede">
-      Every course is free when a friend invites you. Owning one is what lets
-      you start the match on it.
-    </p>
-    <div class="film-grid">
-      <div class="plate">
-        <div class="screen"><picture>
-  <source type="image/webp" srcset="t-invite.webp">
-  <img src="t-invite.jpg" alt="The G app open in an iMessage conversation" loading="lazy">
-</picture></div>
-        <p class="cap">Tap the apps button in any thread and pick the G.</p>
-      </div>
-      <div class="plate">
-        <div class="screen"><picture>
-  <source type="image/webp" srcset="t-bubble.webp">
-  <img src="t-bubble.jpg" alt="A finished hole waiting to send in the message field" loading="lazy">
-</picture></div>
-        <p class="cap">Your hole becomes the message. Send it and the ball is in their court.</p>
-      </div>
-      <div class="plate">
-        <div class="screen"><picture>
-  <source type="image/webp" srcset="t-replay.webp">
-  <img src="t-replay.jpg" alt="A ghost replay of the opponent's round" loading="lazy">
-</picture></div>
-        <p class="cap">They open it and watch your round play out before taking their turn.</p>
-      </div>
-    </div>
-  </section>
+    <p class="note">Free to download · iPhone and iPad</p>
+  </div>
+</section>
 
-  <!-- THE CLOSE -->
-  <section class="close">
-    <img class="mark" src="g-mark.svg" alt="G">
-    <h2>Someone in your messages owes you a round.</h2>
-    <p>
-      Send them a hole. The first one is a message they open whenever.
-    </p>
-    <div class="badges">
-      <a class="cta" href="https://apps.apple.com/us/app/golf-game-g/id6790259018">Get G on the App Store</a>
-      <a class="cta quiet" id="share" href="sms:&amp;body=Golf%20you%20play%20inside%20a%20text.%20https%3A%2F%2Fapps.apple.com%2Fus%2Fapp%2Fgolf-game-g%2Fid6790259018">Send it to someone</a>
-      <span class="cta-note">Free on iPhone and iPad</span>
-    </div>
-  </section>
+</main>
 
-  <div class="foot">
-    <div>© 2026 Mountain Media Digital LLC</div>
-    <nav>
+<footer class="foot">
+  <div class="wrap">
+    <div>© 2026 Mountain Media Digital LLC · La Conner, WA</div>
+    <nav aria-label="Footer">
       <a href="/">Studio</a>
-      <a href="/g-privacy.html">Privacy</a>
       <a href="/g-support.html">Support</a>
+      <a href="/g-privacy.html">Privacy</a>
+      <a href="https://www.tiktok.com/@golfgameg">TikTok</a>
+      <a href="https://apps.apple.com/app/apple-store/id6790259018?pt=128826739&amp;ct=website&amp;mt=8">App Store</a>
       <a href="mailto:hello@mountainmediadigital.com">Contact</a>
     </nav>
   </div>
-
-</div>
-
+</footer>
 
 <script>
 (function () {
+  var root = document.documentElement;
   var quiet = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var clips = Array.prototype.slice.call(document.querySelectorAll('.screen video'));
-  if (!clips.length) { return; }
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
 
+  // Hole-in-one challenge: shown only until the end of Dec 31, 2026 (Pacific).
+  $$('[data-until]').forEach(function (el) {
+    var end = Date.parse(el.getAttribute('data-until'));
+    if (!isNaN(end) && Date.now() < end) { el.hidden = false; }
+    else if (el.parentNode) { el.parentNode.removeChild(el); }
+  });
+
+  // Scroll-in. Everything starts visible without script; with script,
+  // each item animates in once as it reaches the viewport.
+  var items = $$('.rv, .dp, .pk, .fl');
+  var sweeps = $$('.sweep');
+  function showAll() {
+    items.forEach(function (el) { el.classList.add('in'); });
+    sweeps.forEach(function (s) { s.classList.add('done'); });
+  }
+  if (!('IntersectionObserver' in window) || quiet.matches) {
+    showAll();
+  } else {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+    items.forEach(function (el) {
+      // Anything already above the fold just plays its entrance.
+      io.observe(el);
+    });
+
+    // The big flag sweep: one eased progress value drives both the pole
+    // and the green reveal, so the edge always sits under the pole.
+    // MOTION.md "inout" = cubic-bezier(.65, 0, .35, 1).
+    function bez(x1, y1, x2, y2) {
+      function c(a, b, t) { return ((1 - 3 * b + 3 * a) * t + (3 * b - 6 * a)) * t * t + 3 * a * t; }
+      return function (x) {
+        var lo = 0, hi = 1, t = x;
+        for (var i = 0; i < 24; i++) { var v = c(x1, x2, t); if (v < x) { lo = t; } else { hi = t; } t = (lo + hi) / 2; }
+        return c(y1, y2, t);
+      };
+    }
+    var inout = bez(.65, 0, .35, 1);
+    function wipe(s) {
+      var fl = s.querySelector('.sw'), cloth = fl.querySelector('svg');
+      var from = s.clientWidth + 8, to = -(cloth.getBoundingClientRect().width + 48);
+      var t0 = null, D = 1050, over = false, frames = 0;
+      function end() { if (over) { return; } over = true; s.classList.add('done'); s.classList.remove('armed'); fl.style.transform = ''; }
+      function f(now) {
+        frames++;
+        if (t0 === null) { t0 = now; }
+        var t = Math.min(1, (now - t0) / D), x = from + (to - from) * inout(t);
+        fl.style.transform = 'translateX(' + x.toFixed(1) + 'px)';
+        s.style.setProperty('--clip', Math.max(0, x).toFixed(1) + 'px');
+        if (t > .5) { s.classList.add('done'); }
+        if (t < 1) { requestAnimationFrame(f); } else { end(); }
+      }
+      requestAnimationFrame(f);
+      // If frames are throttled (background tab, low power), never leave
+      // the section cream and empty: finish without the wipe.
+      setTimeout(function () { if (!frames) { end(); } }, 600);
+      setTimeout(end, 5000);
+    }
+
+    // The big flag sweep: cream wipes to green behind the pole.
+    sweeps.forEach(function (s) {
+      var r = s.getBoundingClientRect();
+      if (r.top < innerHeight * 0.9) { s.classList.add('done'); return; } // already on screen: no wipe
+      s.classList.add('armed');
+      var so = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (!e.isIntersecting) { return; }
+          so.disconnect();
+          wipe(s);
+        });
+      }, { rootMargin: '0px 0px -30% 0px', threshold: 0 });
+      so.observe(s);
+    });
+    // Safety net: never leave content hidden if observers stall.
+    addEventListener('load', function () { setTimeout(function () {
+      items.forEach(function (el) {
+        var b = el.getBoundingClientRect();
+        if (b.bottom < 0) { el.classList.add('in'); }
+      });
+    }, 1500); });
+  }
+
+  // Gameplay clips: the src loads only once a clip is on screen, it
+  // pauses when it scrolls away, and it never autoplays with reduced
+  // motion. Click, Space/Enter, or the round button toggles it.
+  var clips = $$('.reel video');
+  var held = []; // clips the visitor paused on purpose
+  function btn(v) { return v.closest('figure').querySelector('.pp'); }
+  function sync(v) {
+    var b = btn(v), on = !v.paused;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.setAttribute('aria-label', (on ? 'Pause ' : 'Play ') + (v.dataset.src === 'flyover.mp4' ? 'the flyover clip' : 'the drive clip'));
+  }
+  function load(v) { if (!v.src && v.dataset.src) { v.src = v.dataset.src; } }
+  function play(v) { load(v); var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
   function onScreen(v) {
     var r = v.getBoundingClientRect();
     if (!r.height) { return false; }
-    var top = Math.max(r.top, 0);
-    var bot = Math.min(r.bottom, window.innerHeight || 0);
-    return (bot - top) / r.height > 0.25;
+    var vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+    return vis / r.height > 0.35;
   }
-
-  // A clip is a few hundred KB, so its src is withheld until it is
-  // actually on screen, and it pauses again once it scrolls away.
-  // Plain rect maths rather than IntersectionObserver: fewer moving
-  // parts, and it behaves the same everywhere.
   function settle() {
     clips.forEach(function (v) {
       var here = onScreen(v);
-      if (here && !v.src && v.dataset.src) { v.src = v.dataset.src; }
-      if (here && !quiet.matches) {
-        if (v.paused) { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
-      } else if (!v.paused) {
-        v.pause();
-      }
+      if (here && !quiet.matches && held.indexOf(v) < 0) { if (v.paused) { play(v); } }
+      else if (!here && !v.paused) { v.pause(); }
     });
   }
-
-  // settle() is two getBoundingClientRect calls, cheap enough to run
-  // straight off the scroll. No rAF or IntersectionObserver gate: if
-  // either is throttled (a backgrounded tab, say) the clips would never
-  // load at all, and the clips are the point of the page.
+  clips.forEach(function (v) {
+    function toggle(e) {
+      if (e) { e.preventDefault(); }
+      if (v.paused) { held = held.filter(function (x) { return x !== v; }); play(v); }
+      else { held.push(v); v.pause(); }
+    }
+    v.addEventListener('play', function () { sync(v); });
+    v.addEventListener('pause', function () { sync(v); });
+    v.addEventListener('click', toggle);
+    v.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter' || e.key === 'Spacebar') { toggle(e); }
+    });
+    btn(v).addEventListener('click', toggle);
+  });
   addEventListener('scroll', settle, { passive: true });
   addEventListener('resize', settle);
   addEventListener('load', settle);
   if (quiet.addEventListener) { quiet.addEventListener('change', settle); }
   settle();
 
-  // The close hands you a half-written message. The href is an sms:
-  // link so it works with no script at all on an iPhone or a Mac; where
-  // the share sheet exists (Android, desktop) prefer that, since sms:
-  // is a dead end on those.
+  // The close hands you a half-written message. sms: works with no
+  // script on iPhone and Mac; where a share sheet exists, prefer it.
   var share = document.getElementById('share');
   if (share && navigator.share) {
     share.addEventListener('click', function (e) {
@@ -807,26 +871,11 @@
       navigator.share({
         title: 'G',
         text: 'Golf you play inside a text.',
-        url: 'https://apps.apple.com/us/app/golf-game-g/id6790259018'
+        url: 'https://apps.apple.com/app/apple-store/id6790259018?pt=128826739&ct=website&mt=8'
       }).catch(function () {});
     });
   }
-
-  // Two looping clips with no controls fail WCAG 2.2.2 on their own.
-  clips.forEach(function (v) {
-    function toggle(e) {
-      e.preventDefault();
-      if (!v.src && v.dataset.src) { v.src = v.dataset.src; }
-      if (v.paused) { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
-      else { v.pause(); }
-    }
-    v.addEventListener('click', toggle);
-    v.addEventListener('keydown', function (e) {
-      if (e.key === ' ' || e.key === 'Enter' || e.key === 'Spacebar') { toggle(e); }
-    });
-  });
 })();
 </script>
-
 </body>
 </html>
