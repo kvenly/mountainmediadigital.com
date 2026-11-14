@@ -354,11 +354,42 @@
   .promo li .num { flex: none; margin: 0; width: 32px; height: 32px; font-size: 14px; }
   .promo .sig { margin-top: 24px; font-size: 17px; color: var(--ink); }
   .promo .sig a { color: var(--green); font-weight: 600; }
-  .promo .art { position: relative; width: 72%; max-width: 330px; margin: 0 auto; }
-  .promo .art .print { transform: rotate(3deg); }
-  .promo .art .stamp { position: absolute; left: -12%; top: 10%; z-index: 4; transform: rotate(-14deg); }
+  .promo .card { padding-bottom: 64px; gap: 4px; }
+  .acefilm { position: relative; z-index: 2; width: 100%; max-width: 940px; margin: -36px auto 0; padding: 3% 3% 0; transform: rotate(-1.2deg); }
+  .acefilm:first-child { margin-top: 0; }
+  .acefilm .ph { aspect-ratio: 16 / 9; position: relative; }
+  .acefilm video { cursor: pointer; }
+  .acefilm .vposter { position: absolute; inset: 0; transition: opacity .24s var(--out); }
+  .acefilm .vposter img { width: 100%; height: 100%; object-fit: cover; }
+  .acefilm.started .vposter { opacity: 0; pointer-events: none; }
+  .acefilm .bigplay { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+    background: rgba(255,253,246,.94); color: var(--green); display: grid; place-items: center; pointer-events: none;
+    box-shadow: 0 10px 24px -8px rgba(24,36,28,.5); transition: opacity .24s var(--out), scale .24s var(--out); }
+  .acefilm .bigplay svg { width: 22px; height: 22px; fill: currentColor; margin-left: 4px; }
+  .acefilm.playing .bigplay { opacity: 0; scale: .8; }
+  .acefilm .tape { left: 9%; margin-left: 0; width: 22%; }
+  .acefilm .tape.t2 { left: auto; right: 9%; }
+  .acefilm .aflag { position: absolute; z-index: 5; right: 4%; top: -58px; width: 24px; transform: rotate(9deg); }
+  .acefilm .stamp { position: absolute; z-index: 4; left: -12px; top: 16%; width: 74px; height: 74px; font-size: 10px; }
+  .acefilm .cap { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 2px 14px; }
+  .acefilm .cap b { font-size: 20px; }
+  .acefilm .promo-line { display: block; }
+  .acefilm .promo-line[hidden] { display: none; }
+  .acefilm .promo-line a { color: var(--green); font-weight: 600; }
+  .ctl { display: flex; gap: 8px; flex: none; }
+  .snd { width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer; background: var(--cream); color: var(--green); display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--green); }
+  .snd svg { width: 16px; height: 16px; fill: currentColor; }
+  .snd .w { display: none; }
+  .snd[aria-pressed="true"] .w { display: inline; }
+  .snd[aria-pressed="true"] .x { display: none; }
   @media (min-width: 900px) {
-    .promo .card { grid-template-columns: 1.25fr 1fr; align-items: center; padding: 64px 64px; gap: 56px; }
+    .promo .card { grid-template-columns: 1fr 1fr; align-items: end; padding: 64px 64px 112px; gap: 56px; }
+    .promo .card ol { margin-top: 0; }
+    .acefilm { margin-top: -72px; width: 86%; }
+    .acefilm .aflag { width: 34px; top: -84px; right: -2%; }
+    .acefilm .stamp { width: 96px; height: 96px; font-size: 12px; left: -40px; top: 14%; }
+    .acefilm .bigplay { width: 84px; height: 84px; margin: -42px 0 0 -42px; }
+    .acefilm .bigplay svg { width: 28px; height: 28px; }
   }
 
   /* NEXT + NOTE */
@@ -663,14 +694,18 @@
   </div>
 </section>
 
-<!-- PROMO: shown only through Dec 31, 2026 (script below reveals it) -->
-<section class="sec promo" id="ace" aria-labelledby="ace-h" data-until="2027-01-01T00:00:00-08:00" hidden style="padding-top:0">
+<!-- PROMO + ACE FILM. The challenge card (and the promo line in the
+     caption) shows only through Dec 31, 2026; the film stays after that
+     as a gameplay moment. -->
+<section class="sec promo" id="ace" aria-label="Hole-in-one challenge and an ace on Coral Cay" style="padding-top:0">
   <div class="wrap">
-    <div class="card">
+    <div class="card" data-until="2027-01-01T00:00:00-08:00" hidden>
       <div>
         <span class="when">Through Dec 31, 2026</span>
         <div class="label">Hole-in-one challenge</div>
         <h2 id="ace-h">Ace it. Unlock the full game.</h2>
+      </div>
+      <div>
         <ol>
           <li><span class="num" aria-hidden="true">1</span><span>Sink a hole in one.</span></li>
           <li><span class="num" aria-hidden="true">2</span><span>Tap the film icon, then export your replay from the Locker.</span></li>
@@ -678,11 +713,29 @@
         </ol>
         <p class="sig">I'll send you a link to unlock everything. <span style="white-space:nowrap">— Keven</span></p>
       </div>
-      <div class="art">
-        <figure class="print dp"><span class="tape" style="--tr:4deg"></span><div class="ph"><picture><source type="image/webp" srcset="prints/ace.webp"><img src="prints/ace.jpg" alt="A ball dropping into the cup beside a pink flag" loading="lazy" width="600" height="750"></picture></div><figcaption><b>A real ace</b>The Gyre</figcaption></figure>
-        <span class="stamp pk" style="--d:.45s">Hole<br>in one</span>
-      </div>
     </div>
+    <figure class="print acefilm dp" id="ace-film">
+      <span class="tape" style="--tr:-3deg"></span>
+      <span class="tape t2" style="--tr:4deg"></span>
+      <span class="aflag fl" style="--d:.5s"><svg class="flag" viewBox="0 0 24 60" aria-hidden="true" focusable="false"><rect class="pole" width="1.7" height="60" rx=".85"/><path class="cloth" d="M1.7 0 23 7.7 1.7 15.3Z"/></svg></span>
+      <span class="stamp pk" style="--d:.6s">Hole<br>in one</span>
+      <div class="ph">
+        <video data-ace muted loop playsinline preload="none" tabindex="0" width="1600" height="900"
+               aria-label="Video: a hole in one on Coral Cay. The ball lands on the green and rolls into the cup, then the golfer celebrates. Press Space or Enter to play or pause.">
+          <source data-src="film/ace-coralcay-960.mp4" type="video/mp4" media="(max-width: 700px)">
+          <source data-src="film/ace-coralcay-1600.mp4" type="video/mp4">
+        </video>
+        <picture class="vposter" aria-hidden="true"><source type="image/webp" srcset="film/ace-coralcay-poster.webp"><img src="film/ace-coralcay-poster.jpg" alt="" width="1280" height="720" loading="lazy"></picture>
+        <span class="bigplay" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M3 1.5l7.5 4.5L3 10.5z"/></svg></span>
+      </div>
+      <figcaption class="cap">
+        <span><b>An ace on Coral Cay.</b><span class="promo-line" data-until="2027-01-01T00:00:00-08:00" hidden>This is the kind of clip to post. Tag <a href="https://www.tiktok.com/@golfgameg">@GolfGameG</a>.</span></span>
+        <span class="ctl">
+          <button class="snd" type="button" aria-pressed="false" aria-label="Turn sound on"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h3l4-3v10l-4-3H2z"/><path class="w" d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.6a6 6 0 0 1 0 8.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="x" d="M11 6l4 4M15 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button class="pp" type="button" aria-pressed="false" aria-label="Play the ace video"><svg class="i-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg><svg class="i-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1h3v10H2zM7 1h3v10H7z"/></svg></button>
+        </span>
+      </figcaption>
+    </figure>
   </div>
 </section>
 
@@ -882,6 +935,54 @@
   addEventListener('load', settle);
   if (quiet.addEventListener) { quiet.addEventListener('change', settle); }
   settle();
+
+  // The ace film: sources load only when it is first needed. It plays
+  // muted while at least half of it is on screen, pauses when it leaves,
+  // and never autoplays with reduced motion. Sound is opt-in.
+  var af = document.querySelector('video[data-ace]');
+  if (af) {
+    var fig = af.closest('figure'), app = fig.querySelector('.pp'), snd = fig.querySelector('.snd');
+    var userPaused = false, inView = false;
+    var aload = function () {
+      if (af.getAttribute('data-loaded')) { return; }
+      Array.prototype.forEach.call(af.querySelectorAll('source'), function (s) { s.src = s.getAttribute('data-src'); });
+      af.setAttribute('data-loaded', '1'); af.load();
+    };
+    var aplay = function () { aload(); var p = af.play(); if (p && p.catch) { p.catch(function () {}); } };
+    var async_ = function () {
+      var on = !af.paused;
+      fig.classList.toggle('playing', on);
+      app.setAttribute('aria-pressed', on ? 'true' : 'false');
+      app.setAttribute('aria-label', on ? 'Pause the ace video' : 'Play the ace video');
+    };
+    var atoggle = function (e) {
+      if (e) { e.preventDefault(); }
+      if (af.paused) { userPaused = false; aplay(); } else { userPaused = true; af.pause(); }
+    };
+    af.addEventListener('playing', function () { fig.classList.add('started'); });
+    af.addEventListener('play', async_);
+    af.addEventListener('pause', async_);
+    af.addEventListener('click', atoggle);
+    af.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter' || e.key === 'Spacebar') { atoggle(e); }
+    });
+    app.addEventListener('click', atoggle);
+    snd.addEventListener('click', function () {
+      af.muted = !af.muted;
+      snd.setAttribute('aria-pressed', af.muted ? 'false' : 'true');
+      snd.setAttribute('aria-label', af.muted ? 'Turn sound on' : 'Turn sound off');
+      if (!af.muted && af.paused) { userPaused = false; aplay(); }
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          inView = e.isIntersecting;
+          if (inView && !userPaused && !quiet.matches) { aplay(); }
+          else if (!inView && !af.paused) { af.pause(); }
+        });
+      }, { threshold: 0.5 }).observe(af);
+    }
+  }
 
   // The close hands you a half-written message. sms: works with no
   // script on iPhone and Mac; where a share sheet exists, prefer it.
