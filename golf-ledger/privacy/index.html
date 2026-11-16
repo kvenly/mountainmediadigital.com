@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy / Golf Ledger</title>
+<meta name="description" content="Golf Ledger privacy policy. The iOS app runs on your device. No personal data is collected, stored off-device, sold, or shared.">
+<link rel="canonical" href="https://mountainmediadigital.com/golf-ledger/privacy/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:      #fafafa;
+    --fg:      #000000;
+    --fg-dim:  #6a6a6a;
+    --fg-mute: #a8a8a8;
+    --rule:    #e5e5e5;
+    --sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--fg); text-decoration: none; }
+  a:hover { color: var(--fg-dim); }
+  ::selection { background: var(--fg); color: var(--bg); }
+
+  .page { padding: 32px 40px; max-width: 1080px; margin: 0 auto; }
+  @media (max-width: 600px) { .page { padding: 20px; } }
+
+  /* TOP STRIP */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+    color: var(--fg-dim);
+  }
+  .top .meta span { color: var(--fg-mute); padding: 0 4px; }
+  .top nav { display: flex; gap: 28px; }
+  .top nav a { color: var(--fg); }
+  @media (max-width: 600px) {
+    .top { flex-direction: column; gap: 12px; align-items: flex-start; font-size: 13px; }
+    .top nav { gap: 18px; }
+  }
+
+  /* DOC HEADER */
+  .doc-header {
+    padding: 96px 0 64px;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (max-width: 600px) { .doc-header { padding: 56px 0 40px; } }
+
+  .doc-eyebrow {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0;
+    color: var(--fg-dim);
+    margin-bottom: 24px;
+  }
+  .doc-title {
+    font-family: var(--sans);
+    font-weight: 900;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--fg);
+    margin-bottom: 28px;
+  }
+  .doc-meta {
+    font-size: 14px;
+    color: var(--fg-dim);
+  }
+  .doc-meta span { color: var(--fg-mute); padding: 0 6px; }
+
+  /* SECTIONS */
+  section {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (max-width: 600px) { section { padding: 40px 0; } }
+
+  .row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .row { grid-template-columns: 1fr; gap: 16px; }
+  }
+
+  .label {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--fg-dim);
+    letter-spacing: -0.005em;
+  }
+
+  .body p {
+    font-size: 16px;
+    color: var(--fg);
+    line-height: 1.7;
+    max-width: 62ch;
+    margin-bottom: 14px;
+  }
+  .body p:last-child { margin-bottom: 0; }
+  .body p strong { color: var(--fg); font-weight: 600; }
+  .body p.dim { color: var(--fg-dim); }
+
+  .body a {
+    color: var(--fg);
+    border-bottom: 1px solid var(--fg);
+    padding-bottom: 1px;
+  }
+  .body a:hover { color: var(--fg-dim); border-bottom-color: var(--fg-dim); }
+
+  /* DEFINITION LIST STYLE */
+  .body ul {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 14px;
+    max-width: 62ch;
+  }
+  .body ul li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 16px;
+    color: var(--fg);
+    line-height: 1.65;
+    margin-bottom: 6px;
+  }
+  .body ul li:last-child { margin-bottom: 0; }
+  .body ul li::before {
+    content: '/';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--fg-mute);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 56px 0 0;
+    font-size: 13px;
+    color: var(--fg-mute);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer a { color: var(--fg-dim); }
+  footer a:hover { color: var(--fg); }
+  footer .meta span { color: var(--fg-mute); padding: 0 6px; }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="top">
+    <div class="meta">Mountain Media Digital LLC<span>/</span>La Conner, WA<span>/</span>Est. 2026</div>
+    <nav>
+      <a href="/">&larr; Home</a>
+      <a href="/golf-ledger/terms/">Terms</a>
+    </nav>
+  </div>
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Golf Ledger</div>
+    <h1 class="doc-title">Privacy<br>Policy.</h1>
+    <div class="doc-meta">Effective<span>/</span>November 16, 2026</div>
+  </header>
+
+  <section>
+    <div class="row">
+      <div class="label">Overview</div>
+      <div class="body">
+        <p>Golf Ledger is an iOS app from Mountain Media Digital LLC. The bundle ID is com.mountainmediadigital.golfledger. Everything in the app runs on your device. There is no account, no server, no analytics, and no third-party SDKs.</p>
+        <p><strong>We do not collect, store off your device, sell, or share personal data.</strong> The App Store privacy label for Golf Ledger is Data Not Collected.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">What we collect</div>
+      <div class="body">
+        <p>Nothing. Golf Ledger does not collect personal information.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">Microphone and speech</div>
+      <div class="body">
+        <p>Golf Ledger uses the microphone and Apple&rsquo;s on-device speech recognition only while you record a hole note. Recognition runs on your device. The audio is not saved. Only the resulting text note is kept.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">Stored on your device</div>
+      <div class="body">
+        <p>Rounds and notes are stored locally on your device. They are not sent to us. Deleting the app deletes them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">Purchases</div>
+      <div class="body">
+        <p>After 2 free rounds, Golf Ledger offers a one-time in-app purchase of $4.99 through Apple. Family Sharing is enabled.</p>
+        <p>Payments are handled entirely by Apple. Mountain Media Digital never sees your payment information. Refunds go through Apple.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">Children&rsquo;s privacy</div>
+      <div class="body">
+        <p>Golf Ledger does not collect personal information from anyone, including children.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">Changes to this policy</div>
+      <div class="body">
+        <p>If this policy changes, we will post the updated version at this address and change the effective date above. If you keep using Golf Ledger after that date, the updated policy applies.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div class="label">Contact</div>
+      <div class="body">
+        <p>Mountain Media Digital LLC<br>911 Maple Ave<br>La Conner, WA 98257</p>
+        <p>Questions about this privacy policy? Email <a href="mailto:hello@mountainmediadigital.com">hello@mountainmediadigital.com</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="meta">&copy; 2026 Mountain Media Digital LLC<span>/</span>La Conner, WA</div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/golf-ledger/terms/">Terms of Use</a>
+      <a href="mailto:hello@mountainmediadigital.com">Contact</a>
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>

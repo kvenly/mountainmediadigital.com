@@ -12,4 +12,12 @@
     <loc>https://mountainmediadigital.com/g/</loc>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://mountainmediadigital.com/golf-ledger/privacy/</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://mountainmediadigital.com/golf-ledger/terms/</loc>
+    <priority>0.3</priority>
+  </url>
 </urlset>
