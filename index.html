@@ -681,6 +681,10 @@
 // (out of phase per paragraph) so lines reflow continuously. The DOM text
 // stays in place (color: transparent) so screen readers, selection, and
 // SEO all still work.
+//
+// As the layout breathes and reflows, the mountain ASCII alphabet briefly
+// occupies each glyph slot and then resolves into the real letter — as if
+// the hero ramp is retyping the page. Same character family as the mountain.
 import { prepareWithSegments, layoutWithLines }
   from 'https://esm.sh/@chenglou/pretext@latest';
 
@@ -704,6 +708,9 @@ function setupBreathing(el) {
   const color      = cs.color;
   const lineHeight = parseFloat(cs.lineHeight) || fontSize * 1.55;
   const font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+  // Same optical size as body copy so ASCII reads as the typing medium,
+  // not a caption floating beside it.
+  const asciiFont = `700 ${fontSize}px Inconsolata, ui-monospace, monospace`;
 
   const baseWidth = el.clientWidth;
   if (baseWidth < 100) return;                       // too narrow to play with
@@ -745,11 +752,93 @@ function setupBreathing(el) {
   el.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
+  // Hero mountain ramp (light → dark). Skip the leading space so every
+  // retyped slot still reads as ink.
+  const RAMP = ".,'~+=|#";
+  const RAMP_N = RAMP.length;
+
   const PERIOD = 7200 + Math.random() * 1600;        // ~7–9s per paragraph
   const phase  = Math.random() * Math.PI * 2;
   const start  = performance.now();
   let loggedErr = false;
   let alive = true;
+
+  // Per-line typewriter heads. Reflow hard-resets a full retype pass
+  // (ASCII veil ahead of the cursor). Idle loops keep only a narrow
+  // mountain-alphabet cursor so the copy stays readable.
+  let prevLines = [];
+  const typers = [];                                 // {born, passMs, full}
+
+  function rampChar(ci, now) {
+    return RAMP[(ci * 5 + ((now / 50) | 0)) % RAMP_N];
+  }
+
+  function ensureTyper(i, n, now, hardReset) {
+    const passMs = Math.max(860, Math.min(2000, 320 + n * 26));
+    if (!typers[i] || hardReset) {
+      // Stagger lines slightly so the paragraph types top→bottom.
+      typers[i] = { born: now - i * 140, passMs, full: true };
+      return typers[i];
+    }
+    const ty = typers[i];
+    // After a completed full pass (+pause), subsequent loops are cursor-only.
+    const cycle = ty.passMs + 320;
+    if (ty.full && (now - ty.born) >= cycle) {
+      ty.full = false;
+      ty.born = now;
+      ty.passMs = passMs;
+    } else {
+      ty.passMs = passMs;
+    }
+    return ty;
+  }
+
+  function drawRetypedLine(lineText, y, typer, now) {
+    const n = lineText.length;
+    if (!n) return;
+
+    const cycle = typer.passMs + 320;
+    let u = ((now - typer.born) % cycle) / typer.passMs;
+    if (u > 1) u = 1;                                // brief pause at EOL
+    const head = u * (n + 1) - 0.5;
+    const full = typer.full;
+
+    ctx.font = font;
+    const prefixW = new Array(n + 1);
+    prefixW[0] = 0;
+    for (let i = 0; i < n; i++) {
+      prefixW[i + 1] = ctx.measureText(lineText.slice(0, i + 1)).width;
+    }
+
+    ctx.fillStyle = color;
+    for (let ci = 0; ci < n; ci++) {
+      const ch = lineText[ci];
+      const x = prefixW[ci];
+      if (ch === ' ') continue;
+
+      const d = ci - head;
+      // Behind cursor → letter. On cursor → pure ASCII replace.
+      // Ahead → ASCII veil only during a full retype pass.
+      if (d < -1.15) {
+        ctx.font = font;
+        ctx.globalAlpha = 1;
+        ctx.fillText(ch, x, y);
+      } else if (d <= 1.6) {
+        ctx.font = asciiFont;
+        ctx.globalAlpha = 1;
+        ctx.fillText(rampChar(ci, now), x, y);
+      } else if (full) {
+        ctx.font = asciiFont;
+        ctx.globalAlpha = d < 8 ? 0.62 : 0.30;
+        ctx.fillText(rampChar(ci, now), x, y);
+      } else {
+        ctx.font = font;
+        ctx.globalAlpha = 1;
+        ctx.fillText(ch, x, y);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
 
   function render() {
     if (!alive) return;
@@ -771,12 +860,21 @@ function setupBreathing(el) {
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, maxWidth, tall.height);
-      ctx.font = font;
-      ctx.fillStyle = color;
       ctx.textBaseline = 'middle';
-      for (let i = 0; i < laid.lines.length; i++) {
-        ctx.fillText(laid.lines[i].text, 0, (i + 0.5) * lineHeight);
+      ctx.textAlign = 'left';
+
+      const lines = laid.lines;
+      for (let i = 0; i < lines.length; i++) {
+        const lineText = lines[i].text;
+        const y = (i + 0.5) * lineHeight;
+        const prev = prevLines[i];
+        const reflowed = prev != null && prev !== lineText;
+        const ty = ensureTyper(i, lineText.length, now, reflowed || prev == null);
+        drawRetypedLine(lineText, y, ty, now);
       }
+      if (typers.length > lines.length) typers.length = lines.length;
+      prevLines = lines.map(l => l.text);
+
     } catch (e) {
       if (!loggedErr) {
         loggedErr = true;
