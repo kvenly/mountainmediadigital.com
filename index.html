@@ -681,6 +681,10 @@
 // (out of phase per paragraph) so lines reflow continuously. The DOM text
 // stays in place (color: transparent) so screen readers, selection, and
 // SEO all still work.
+//
+// Alongside the reflow, a faint ASCII wake (same character ramp as the
+// hero mountain) trails the moving line edges — enough to read the motion
+// as intentional, quiet enough not to compete with the copy.
 import { prepareWithSegments, layoutWithLines }
   from 'https://esm.sh/@chenglou/pretext@latest';
 
@@ -745,18 +749,60 @@ function setupBreathing(el) {
   el.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
+  // Hero-family ASCII ramp (light → dark). Trails pick from the quieter
+  // mid tones so they read as kin to the mountain, not noise.
+  const RAMP = " .,'~+=|#";
+  const TRAIL_FONT = `700 9px Inconsolata, ui-monospace, monospace`;
+  const CHAR_W = 4.5;                                // ~9px * 0.50 aspect
+  const trails = [];                                 // {x,y,ch,life,born,vx}
+  let prevEnds = [];                                 // prior frame line-end x
+  // Accumulators: per-frame edge travel is sub-pixel (~0.2px), so we bank
+  // motion until a char-width of travel has happened, then drop a glyph.
+  const accrued = [];                                // signed px since last drop
+
   const PERIOD = 7200 + Math.random() * 1600;        // ~7–9s per paragraph
   const phase  = Math.random() * Math.PI * 2;
   const start  = performance.now();
   let loggedErr = false;
   let alive = true;
+  let lastNow = start;
+
+  function spawnTrail(x0, x1, y, energy, force) {
+    // Walk the horizontal path the line edge traveled; drop a few glyphs.
+    const dx = x1 - x0;
+    const dist = Math.abs(dx);
+    if (!force && dist < 0.5) return;
+    const dir = dx < 0 ? -1 : 1;
+    // Cap density so fast swings don't spray a cloud.
+    const n = Math.min(4, Math.max(1, Math.round(dist / (CHAR_W * 1.8)) || 1));
+    const e = Math.min(1, Math.max(0.15, energy));
+    for (let i = 0; i < n; i++) {
+      const t = (i + 0.5) / n;
+      // Mid-ramp characters; denser glyphs for stronger motion.
+      const idx = Math.min(RAMP.length - 2, Math.max(1, 1 + Math.floor(e * 3.5 + Math.random() * 1.5)));
+      trails.push({
+        x: x0 + dx * t + (Math.random() - 0.5) * 1.2,
+        y: y + (Math.random() - 0.5) * lineHeight * 0.16,
+        ch: RAMP[idx],
+        life: 1100 + Math.random() * 900,            // ms
+        born: performance.now(),
+        vx: -dir * (0.006 + e * 0.014),              // drift opposite motion
+      });
+    }
+    // Soft cap so trails stay sparse across many lines.
+    if (trails.length > 40) trails.splice(0, trails.length - 40);
+  }
 
   function render() {
     if (!alive) return;
     try {
       const now = performance.now();
+      const dt  = Math.min(48, now - lastNow);
+      lastNow = now;
       const t   = (now - start) / PERIOD * Math.PI * 2 + phase;
       const w   = minWidth + (maxWidth - minWidth) * (0.5 + 0.5 * Math.sin(t));
+      // |cos| peaks at the steepest part of the breath — use it as energy.
+      const energy = Math.abs(Math.cos(t));
 
       const laid = layoutWithLines(prepared, w, lineHeight);
       const dpr  = devicePixelRatio || 1;
@@ -769,11 +815,70 @@ function setupBreathing(el) {
         canvas.style.height = tall.height + 'px';
       }
 
+      // Measure current line ends and bank motion into a wake.
+      const ends = new Array(laid.lines.length);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.font = font;
+      for (let i = 0; i < laid.lines.length; i++) {
+        const endX = ctx.measureText(laid.lines[i].text).width;
+        ends[i] = endX;
+        const y = (i + 0.5) * lineHeight;
+        if (prevEnds[i] != null) {
+          const step = endX - prevEnds[i];
+          accrued[i] = (accrued[i] || 0) + step;
+          // Abrupt reflow jump: paint the path immediately.
+          if (Math.abs(step) >= CHAR_W * 0.9) {
+            spawnTrail(prevEnds[i], endX, y, Math.max(energy, 0.45), true);
+            accrued[i] = 0;
+          } else if (Math.abs(accrued[i]) >= CHAR_W * 1.15) {
+            // Slow breath: drop one glyph after ~a character of travel.
+            const from = endX - accrued[i];
+            spawnTrail(from, endX, y, Math.max(energy, 0.2), true);
+            accrued[i] = 0;
+          }
+        } else if (prevEnds.length && energy > 0.15) {
+          // Line appeared via reflow — a light dusting at the new end.
+          spawnTrail(endX - CHAR_W * 2, endX, y, energy * 0.55, true);
+          accrued[i] = 0;
+        } else {
+          accrued[i] = 0;
+        }
+      }
+      // Lines that vanished: leave a short farewell at their last end.
+      if (prevEnds.length > ends.length) {
+        for (let i = ends.length; i < prevEnds.length; i++) {
+          const y = (i + 0.5) * lineHeight;
+          spawnTrail(prevEnds[i], prevEnds[i] - CHAR_W * 2.5, y, 0.35, true);
+          accrued[i] = 0;
+        }
+        accrued.length = ends.length;
+      }
+      prevEnds = ends;
+
       ctx.clearRect(0, 0, maxWidth, tall.height);
+
+      // Draw ASCII wake first (behind the copy).
+      if (trails.length) {
+        ctx.font = TRAIL_FONT;
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'left';
+        for (let i = trails.length - 1; i >= 0; i--) {
+          const p = trails[i];
+          const age = now - p.born;
+          if (age >= p.life) { trails.splice(i, 1); continue; }
+          p.x += p.vx * dt;
+          const a = (1 - age / p.life) * 0.26;       // peak ~26% opacity
+          if (a < 0.014) { trails.splice(i, 1); continue; }
+          ctx.fillStyle = `rgba(0,0,0,${a.toFixed(3)})`;
+          ctx.fillText(p.ch, p.x, p.y);
+        }
+      }
+
+      // Body copy on top.
       ctx.font = font;
       ctx.fillStyle = color;
       ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
       for (let i = 0; i < laid.lines.length; i++) {
         ctx.fillText(laid.lines[i].text, 0, (i + 0.5) * lineHeight);
       }
