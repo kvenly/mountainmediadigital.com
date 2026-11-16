@@ -1,0 +1,103 @@
+/* Golf Ledger web styles. Brand rules: /workspace/golf-ledger/web/BRAND-WEB.md
+   Tokens mirror the app (Figma collection "Golf Ledger", Light/Dark). */
+:root {
+  color-scheme: light dark;
+  --paper: #F4F2ED;
+  --ink: #1C1C1C;
+  --graphite: #4F4F4F;
+  --rule: #D9D6CF;
+  --signal: #E8590C;           /* glyphs and marks only */
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --wrap: 1200px;
+  --gutter: clamp(20px, 5vw, 48px);
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px; --s10: 128px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121212; --ink: #F4F2ED; --graphite: #A8A59F; --rule: #2E2D2A; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 17px/1.5 var(--sans);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+img, svg { display: block; max-width: 100%; height: auto; }
+h1, h2, h3, p, dl, dd, ol, ul, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+::selection { background: var(--ink); color: var(--paper); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+
+.skip { position: absolute; left: var(--s4); top: -100px; z-index: 10; background: var(--ink); color: var(--paper); padding: var(--s3) var(--s4); border-radius: 8px; text-decoration: none; }
+.skip:focus { top: var(--s3); }
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding-inline: var(--gutter); }
+
+/* Type scale: 13 / 15 / 17 / 20 / 28 / 34 / clamp(40–72) */
+.label { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--graphite); }
+.small { font-size: 15px; line-height: 22px; color: var(--graphite); }
+.lead { font-size: 20px; line-height: 30px; color: var(--graphite); max-width: 34em; text-wrap: pretty; }
+h1 { font-size: clamp(40px, 6.2vw, 72px); line-height: 1.04; font-weight: 600; letter-spacing: -0.025em; text-wrap: balance; }
+h2 { font-size: clamp(28px, 3.6vw, 44px); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+h3 { font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em; }
+
+/* Header */
+.bar { border-bottom: 1px solid var(--rule); }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); min-height: 64px; flex-wrap: wrap; }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; min-height: 44px; }
+.brand .mark { width: 28px; height: 28px; border-radius: 7px; box-shadow: 0 0 0 1px var(--rule); }
+.nav { display: flex; flex-wrap: wrap; gap: 0 var(--s5); font-size: 15px; }
+.nav a { text-decoration: none; color: var(--graphite); display: inline-flex; align-items: center; min-height: 44px; }
+.nav a:hover, .nav a[aria-current="page"] { color: var(--ink); }
+@media (max-width: 640px) {
+  .bar .wrap { min-height: 56px; }
+  .nav { gap: 0 var(--s4); font-size: 15px; }
+}
+
+/* Mark (inline SVG app icon) */
+.mark .p { fill: var(--paper); } .mark .i { fill: var(--ink); } .mark .s { stroke: var(--ink); } .mark .d { fill: var(--signal); }
+.icon { width: 96px; height: 96px; border-radius: 22.4%; box-shadow: 0 0 0 1px var(--rule); }
+
+/* Buttons. Ink fill only; signal orange is never a fill. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 50px; padding: 0 22px; border-radius: 12px; background: var(--ink); color: var(--paper); font-weight: 600; font-size: 17px; text-decoration: none; border: 1px solid var(--ink); }
+.btn:hover { background: transparent; color: var(--ink); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn-ghost:hover { border-color: var(--ink); }
+
+/* Section rhythm: every section opens on a ledger rule with a numbered label. */
+.sec { padding-block: var(--s9); }
+.sec + .sec { border-top: 1px solid var(--rule); }
+.sec-head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s5); row-gap: var(--s4); margin-bottom: var(--s8); }
+.sec-head .label { grid-column: 1 / span 3; display: flex; gap: var(--s3); padding-top: 0.6em; }
+.sec-head .label .n { color: var(--ink); }
+.sec-head .copy { grid-column: 4 / -1; display: grid; gap: var(--s4); }
+@media (max-width: 860px) {
+  .sec { padding-block: var(--s8); }
+  .sec-head { margin-bottom: var(--s7); }
+  .sec-head .label, .sec-head .copy { grid-column: 1 / -1; padding-top: 0; }
+}
+
+/* Ledger rows (definition list as a two-column card) */
+.ledger { border-top: 1px solid var(--ink); }
+.ledger > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--s4); padding: 14px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.ledger dt { color: var(--graphite); font-size: 15px; }
+.ledger dd { font-weight: 600; }
+.ledger dd span { display: block; font-weight: 400; font-size: 15px; line-height: 22px; color: var(--graphite); margin-top: 2px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--rule); padding-block: var(--s6) var(--s7); font-size: 15px; color: var(--graphite); }
+.foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s3) var(--s6); align-items: center; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 0 var(--s5); }
+.foot a { color: var(--graphite); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
+.foot a:hover { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

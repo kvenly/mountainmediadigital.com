@@ -1,298 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Terms of Use / Golf Ledger</title>
 <meta name="description" content="Golf Ledger terms of use. A license to use the iOS app from Mountain Media Digital LLC. Apple's standard Licensed Application EULA also applies.">
 <link rel="canonical" href="https://mountainmediadigital.com/golf-ledger/terms/">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
-
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4F2ED" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Golf Ledger">
+<meta property="og:title" content="Terms of Use / Golf Ledger">
+<meta property="og:description" content="Golf Ledger terms of use. A license to use the iOS app from Mountain Media Digital LLC. Apple's standard Licensed Application EULA also applies.">
+<meta property="og:url" content="https://mountainmediadigital.com/golf-ledger/terms/">
+<meta property="og:image" content="https://mountainmediadigital.com/golf-ledger/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Golf Ledger app icon beside a scorecard row: Hole 7, par 4, score 5, 2 putts.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/golf-ledger/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/golf-ledger/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/golf-ledger/apple-touch-icon.png">
+<link rel="stylesheet" href="/golf-ledger/gl.css">
 <style>
-  :root {
-    --bg:      #fafafa;
-    --fg:      #000000;
-    --fg-dim:  #6a6a6a;
-    --fg-mute: #a8a8a8;
-    --rule:    #e5e5e5;
-    --sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --mono:    'Inconsolata', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--sans);
-    font-weight: 400;
-    line-height: 1.4;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-  a { color: var(--fg); text-decoration: none; }
-  a:hover { color: var(--fg-dim); }
-  ::selection { background: var(--fg); color: var(--bg); }
-
-  .page { padding: 32px 40px; max-width: 1080px; margin: 0 auto; }
-  @media (max-width: 600px) { .page { padding: 20px; } }
-
-  /* TOP STRIP */
-  .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--rule);
-    font-size: 14px;
-    color: var(--fg-dim);
-  }
-  .top .meta span { color: var(--fg-mute); padding: 0 4px; }
-  .top nav { display: flex; gap: 28px; }
-  .top nav a { color: var(--fg); }
-  @media (max-width: 600px) {
-    .top { flex-direction: column; gap: 12px; align-items: flex-start; font-size: 13px; }
-    .top nav { gap: 18px; }
-  }
-
-  /* DOC HEADER */
-  .doc-header {
-    padding: 96px 0 64px;
-    border-bottom: 1px solid var(--rule);
-  }
-  @media (max-width: 600px) { .doc-header { padding: 56px 0 40px; } }
-
-  .doc-eyebrow {
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0;
-    color: var(--fg-dim);
-    margin-bottom: 24px;
-  }
-  .doc-title {
-    font-family: var(--sans);
-    font-weight: 900;
-    font-size: clamp(2.5rem, 7vw, 5.5rem);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    color: var(--fg);
-    margin-bottom: 28px;
-  }
-  .doc-meta {
-    font-size: 14px;
-    color: var(--fg-dim);
-  }
-  .doc-meta span { color: var(--fg-mute); padding: 0 6px; }
-
-  /* SECTIONS */
-  section {
-    padding: 56px 0;
-    border-bottom: 1px solid var(--rule);
-  }
-  @media (max-width: 600px) { section { padding: 40px 0; } }
-
-  .row {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 48px;
-    align-items: start;
-  }
-  @media (max-width: 720px) {
-    .row { grid-template-columns: 1fr; gap: 16px; }
-  }
-
-  .label {
-    font-family: var(--sans);
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--fg-dim);
-    letter-spacing: -0.005em;
-  }
-
-  .body p {
-    font-size: 16px;
-    color: var(--fg);
-    line-height: 1.7;
-    max-width: 62ch;
-    margin-bottom: 14px;
-  }
-  .body p:last-child { margin-bottom: 0; }
-  .body p strong { color: var(--fg); font-weight: 600; }
-  .body p.dim { color: var(--fg-dim); }
-
-  .body a {
-    color: var(--fg);
-    border-bottom: 1px solid var(--fg);
-    padding-bottom: 1px;
-  }
-  .body a:hover { color: var(--fg-dim); border-bottom-color: var(--fg-dim); }
-
-  /* DEFINITION LIST STYLE */
-  .body ul {
-    list-style: none;
-    padding: 0;
-    margin: 16px 0 14px;
-    max-width: 62ch;
-  }
-  .body ul li {
-    position: relative;
-    padding-left: 22px;
-    font-size: 16px;
-    color: var(--fg);
-    line-height: 1.65;
-    margin-bottom: 6px;
-  }
-  .body ul li:last-child { margin-bottom: 0; }
-  .body ul li::before {
-    content: '/';
-    position: absolute;
-    left: 0;
-    top: 0;
-    color: var(--fg-mute);
-    font-family: var(--mono);
-    font-weight: 700;
-  }
-
-  /* FOOTER */
-  footer {
-    padding: 56px 0 0;
-    font-size: 13px;
-    color: var(--fg-mute);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  footer a { color: var(--fg-dim); }
-  footer a:hover { color: var(--fg); }
-  footer .meta span { color: var(--fg-mute); padding: 0 6px; }
-  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after { transition: none !important; animation: none !important; }
+  .doc { padding-block: var(--s9) var(--s8); }
+  .doc-head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s5); row-gap: var(--s4); padding-bottom: var(--s7); border-bottom: 1px solid var(--ink); }
+  .doc-head > * { grid-column: 4 / -1; }
+  .doc-head .label { grid-column: 1 / span 3; grid-row: 1; align-self: end; padding-bottom: 0.9em; }
+  .doc-head .meta { font-size: 15px; color: var(--graphite); }
+  .clause { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s5); row-gap: var(--s3); padding-block: var(--s6); border-bottom: 1px solid var(--rule); }
+  .clause h2 { grid-column: 1 / span 3; font-size: 17px; line-height: 26px; font-weight: 600; letter-spacing: 0; display: flex; gap: var(--s3); }
+  .clause h2 .n { color: var(--graphite); font-weight: 600; flex: none; min-width: 1.6em; }
+  .clause .body { grid-column: 4 / span 7; display: grid; gap: var(--s4); }
+  .clause .body p { max-width: 38em; }
+  .clause .body p.dim { color: var(--graphite); font-size: 15px; line-height: 22px; }
+  .clause .body strong { font-weight: 600; }
+  .clause .body a { text-decoration-color: var(--graphite); }
+  .clause .body a:hover { text-decoration-color: currentColor; }
+  .doc-foot { padding-top: var(--s6); display: flex; flex-wrap: wrap; gap: 0 var(--s5); }
+  .doc-foot a { font-weight: 600; text-decoration-color: var(--rule); display: inline-flex; align-items: center; min-height: 44px; }
+  .doc-foot a:hover { text-decoration-color: currentColor; }
+  @media (max-width: 860px) {
+    .doc { padding-block: var(--s7) var(--s7); }
+    .doc-head > *, .doc-head .label { grid-column: 1 / -1; grid-row: auto; padding-top: 0; }
+    .clause { padding-block: var(--s5); }
+    .clause h2, .clause .body { grid-column: 1 / -1; }
   }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<div class="page">
-
-  <div class="top">
-    <div class="meta">Mountain Media Digital LLC<span>/</span>La Conner, WA<span>/</span>Est. 2026</div>
-    <nav>
-      <a href="/">&larr; Home</a>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="/golf-ledger/" aria-label="Golf Ledger home">
+      <svg class="mark" viewBox="208 208 608 608" aria-hidden="true" focusable="false"><rect class="p" x="208" y="208" width="608" height="608"/><rect class="s" x="288" y="288" width="448" height="448" fill="none" stroke-width="40"/><path class="i" d="M402.46 578.6V542.91L518.41 380H546.77V425.22H530.9L448.09 541.72V542.08H609.54V578.6ZM531.17 636V380H574.2V636Z"/><circle class="d" cx="672" cy="352" r="34"/></svg>
+      <span>Golf Ledger</span>
+    </a>
+    <nav class="nav" aria-label="Golf Ledger">
+      <a href="/golf-ledger/">The app</a>
       <a href="/golf-ledger/privacy/">Privacy</a>
+      <a href="/golf-ledger/terms/" aria-current="page">Terms</a>
     </nav>
   </div>
+</header>
 
-  <header class="doc-header">
-    <div class="doc-eyebrow">Golf Ledger</div>
-    <h1 class="doc-title">Terms<br>of Use.</h1>
-    <div class="doc-meta">Effective<span>/</span>November 16, 2026</div>
-  </header>
+<main id="main" class="doc">
+  <div class="wrap">
+    <header class="doc-head">
+      <p class="label">Golf Ledger</p>
+      <h1>Terms of Use.</h1>
+      <p class="meta">Effective November 16, 2026</p>
+    </header>
 
-  <section>
-    <div class="row">
-      <div class="label">Agreement</div>
+    <section class="clause" aria-labelledby="s1">
+      <h2 id="s1"><span class="n" aria-hidden="true">01</span><span>Agreement</span></h2>
       <div class="body">
         <p>These terms are an agreement between you and Mountain Media Digital LLC for Golf Ledger, an iOS app. The bundle ID is com.mountainmediadigital.golfledger. By downloading or using Golf Ledger, you agree to these terms.</p>
         <p>Apple&rsquo;s <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Licensed Application End User License Agreement</a> also applies. These terms are between you and Mountain Media Digital LLC. Apple is not a party to these terms and is not responsible for Golf Ledger or its content.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">License</div>
+    <section class="clause" aria-labelledby="s2">
+      <h2 id="s2"><span class="n" aria-hidden="true">02</span><span>License</span></h2>
       <div class="body">
         <p>We grant you a non-exclusive license to use Golf Ledger on Apple devices that you own or control, as allowed by the App Store and Apple&rsquo;s Licensed Application EULA. When Family Sharing applies, Apple&rsquo;s Family Sharing rules cover who else may use the purchase.</p>
         <p>This is a license to use the app. It is not a sale of the app.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">The purchase</div>
+    <section class="clause" aria-labelledby="s3">
+      <h2 id="s3"><span class="n" aria-hidden="true">03</span><span>The purchase</span></h2>
       <div class="body">
         <p>After 2 free rounds, Golf Ledger offers a one-time in-app purchase of $4.99 through Apple. Family Sharing is enabled. Apple handles how that purchase is shared with a Family Sharing group.</p>
         <p>Payments are handled entirely by Apple. Mountain Media Digital never sees your payment information. Refunds go through Apple.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">Informational only</div>
+    <section class="clause" aria-labelledby="s4">
+      <h2 id="s4"><span class="n" aria-hidden="true">04</span><span>Informational only</span></h2>
       <div class="body">
         <p>Golf Ledger keeps rounds and hole notes on your device. It is informational. Mountain Media Digital is not responsible for scoring disputes, or for decisions anyone makes based on what is kept in the app.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">Disclaimer of warranties</div>
+    <section class="clause" aria-labelledby="s5">
+      <h2 id="s5"><span class="n" aria-hidden="true">05</span><span>Disclaimer of warranties</span></h2>
       <div class="body">
         <p>Golf Ledger is provided as is and as available. To the extent the law allows, Mountain Media Digital LLC disclaims warranties of any kind, express or implied, including implied warranties of merchantability and fitness for a particular purpose.</p>
         <p class="dim">Some places do not allow these disclaimers. Where they do not, this section applies only as far as the law allows.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">Limitation of liability</div>
+    <section class="clause" aria-labelledby="s6">
+      <h2 id="s6"><span class="n" aria-hidden="true">06</span><span>Limitation of liability</span></h2>
       <div class="body">
         <p>To the extent the law allows, Mountain Media Digital LLC is not liable for indirect, incidental, or consequential damages arising out of your use of Golf Ledger, including rounds or notes stored only on your device. Our total liability for any claim related to the app is limited to the amount you paid Apple for it.</p>
         <p class="dim">Some places do not allow these limits. Where they do not, this section applies only as far as the law allows.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">Governing law</div>
+    <section class="clause" aria-labelledby="s7">
+      <h2 id="s7"><span class="n" aria-hidden="true">07</span><span>Governing law</span></h2>
       <div class="body">
         <p>These terms are governed by the laws of the State of Washington.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">Changes</div>
+    <section class="clause" aria-labelledby="s8">
+      <h2 id="s8"><span class="n" aria-hidden="true">08</span><span>Changes</span></h2>
       <div class="body">
         <p>If these terms change, we will post the updated version at this address and change the effective date above. If you keep using Golf Ledger after that date, the updated terms apply.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div class="row">
-      <div class="label">Contact</div>
+    <section class="clause" aria-labelledby="s9">
+      <h2 id="s9"><span class="n" aria-hidden="true">09</span><span>Contact</span></h2>
       <div class="body">
         <p>Mountain Media Digital LLC<br>911 Maple Ave<br>La Conner, WA 98257</p>
         <p>Questions about these terms? Email <a href="mailto:hello@mountainmediadigital.com">hello@mountainmediadigital.com</a>. The <a href="/golf-ledger/privacy/">Privacy Policy</a> describes how the app handles information.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer>
-    <div class="meta">&copy; 2026 Mountain Media Digital LLC<span>/</span>La Conner, WA</div>
-    <div class="footer-links">
-      <a href="/">Home</a>
+    <nav class="doc-foot" aria-label="Related">
       <a href="/golf-ledger/privacy/">Privacy Policy</a>
+      <a href="/golf-ledger/">Golf Ledger</a>
+    </nav>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>&copy; 2026 Mountain Media Digital LLC &middot; La Conner, WA</p>
+    <nav aria-label="Footer">
+      <a href="/golf-ledger/privacy/">Privacy</a>
+      <a href="/golf-ledger/terms/">Terms</a>
       <a href="mailto:hello@mountainmediadigital.com">Contact</a>
-    </div>
-  </footer>
-
-</div>
-
+      <a href="/">Mountain Media Digital</a>
+    </nav>
+  </div>
+</footer>
 </body>
 </html>

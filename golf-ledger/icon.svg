@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- PLACEHOLDER app icon. Replace with the real Golf Ledger icon. -->
-  <rect width="32" height="32" fill="#000"/>
-  <path d="M4 16h4l2-5 3 10 2.5-7H19l2 5 2-3h5" fill="none" stroke="#fafafa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="208 208 608 608"><style>.p{fill:#F4F2ED}.i{fill:#1C1C1C}.s{stroke:#1C1C1C}@media (prefers-color-scheme:dark){.p{fill:#121212}.i{fill:#F4F2ED}.s{stroke:#F4F2ED}}</style><rect class="p" x="208" y="208" width="608" height="608" rx="120"/><rect class="s" x="288" y="288" width="448" height="448" fill="none" stroke-width="36"/><path class="i" d="M402.46 578.6V542.91L518.41 380H546.77V425.22H530.9L448.09 541.72V542.08H609.54V578.6ZM531.17 636V380H574.2V636Z"/><circle cx="672" cy="352" r="30" fill="#E8590C"/></svg>
